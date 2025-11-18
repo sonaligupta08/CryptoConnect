@@ -19,13 +19,16 @@
 			<!--sidebar-->
 			<div class="col-md-3 sidebar d-none d-md-flex flex-column">
 				<h2 class="brand"><img src="bitcoin.png.png" alt="bitcoin" class="coin-img "></h2>
-				<ul>
-					<li><i class='bx bx-home'></i>Home</li>
-					<li><i class='bx bx-bell'></i>Notification</li>
-					<li><i class='bx bx-bell'></i>Messages</li>
-					<li><i class='bx bx-group'></i> Communities</li>
-					<li><i class='bx bx-user'></i>profile</li>
-				</ul>
+				<div class="menu">
+					<ul>
+						<li><i class='bx bx-home'></i>Home</li>
+						<li><i class='bx bx-bell'></i>Notification</li>
+						<li><i class='bx bx-bell'></i>Messages</li>
+						<li><i class='bx bx-group'></i> Communities</li>
+						<li><i class='bx bx-user'></i>profile</li>
+					</ul>
+				</div>
+
 
 				<button class="post-btn">Post</button>
 
@@ -60,7 +63,7 @@
 				<div id="post-feed"></div>
 			</div>
 
-		
+
 
 			<!--right section-->
 			<div class="col-md-3 d-none d-md-block content-2" id="left">
@@ -109,6 +112,12 @@
 				</div>
 				<p class="post-text">${text}</p>
 				 <hr style="border-color:#2f3336;">
+            <div class="action-buttons">
+                 <button><i class='bx bx-heart'></i></button>
+                 <button><i class='bx bx-chat'></i></button>
+                 <button><i class='bx bx-share'></i></button>
+           </div>
+		   
 		 `;
 			postFeed.prepend(postDiv);
 			inputBox.value = "";
