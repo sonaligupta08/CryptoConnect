@@ -8,6 +8,8 @@
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 	<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<script src="https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@3.1.1/dist/index.min.js"></script>
+
 
 	<title>Dashboard</title>
 </head>
@@ -51,9 +53,13 @@
 						<div class="profile-pic">?</div>
 						<textarea placeholder="What's happening?" id="input" rows="2"></textarea>
 
+						<input type="file" id="imageUpload" accept="image/*" style="display:none;">
+						<div id="image-preview"></div>
 					</div>
 					<div class="emojis">
-						<a><i class="fa-regular fa-image"></i></a>
+						<a onclick="document.getElementById('imageUpload').click()">
+							<i class="fa-regular fa-image"></i>
+						</a>
 						<a><i class='bx bx-smile'></i></a>
 						<a><i class='bx bx-photo-album'></i> </a>
 						<a><i class='bx bx-bar-chart-alt'></i></a>
@@ -90,6 +96,33 @@
 		const postBtn = document.querySelector(".post");
 		const inputBox = document.getElementById("input");
 		const postFeed = document.getElementById("post-feed");
+		const emojiBtn = document.querySelector(".bx-smile");
+		const picker = new EmojiButton();
+
+		picker.on('emoji', emoji => {
+			inputBox.value += emoji;
+		});
+
+		emojiBtn.addEventListener('click', () => {
+			picker.togglePicker(emojiBtn);
+		});
+
+
+		const imageInput = document.getElementById("imageUpload");
+		let selectedImage = null;
+
+		imageInput.addEventListener("change", () => {
+			const file = imageInput.files[0];
+			if (!file) return;
+
+			const reader = new FileReader();
+			reader.onload = (e) => {
+				selectedImage = e.target.result;
+
+				document.getElementById("image-preview").innerHTML = `<img src="${selectedImage}">`;
+			};
+			reader.readAsDataURL(file);
+		});
 
 		postBtn.addEventListener("click", () => {
 
@@ -111,7 +144,10 @@
 					</div>
 				</div>
 				<p class="post-text">${text}</p>
-				 <hr style="border-color:#2f3336;">
+
+				${selectedImage ? `<img src="${selectedImage}" class="posted-img">` : ""}
+
+				 <hr style="border-col5or:#2f3336;">
             <div class="action-buttons">
                  <button><i class='bx bx-heart'></i></button>
                  <button><i class='bx bx-chat'></i></button>
@@ -121,6 +157,10 @@
 		 `;
 			postFeed.prepend(postDiv);
 			inputBox.value = "";
+			selectedImage = null;
+			imageInput.value = "";
+			document.getElementById("image-preview").innerHTML = "";
+
 		});
 	</script>
 </body>

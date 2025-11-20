@@ -135,7 +135,7 @@ body {
 
 #input {
     background-color: rgba(0, 0, 0, 0.2);
-    padding: 60px;
+    padding: 10px;
     width: 100%;
     color: #fff;
     font-size: 1.1rem;
@@ -243,4 +243,17 @@ body {
 .action-buttons button:hover {
     color: #1d9bf0;
     background-color: rgba(29, 155, 240, 0.15);
+}
+
+.posted-img {
+    height: 200px;
+    width: 200px;
+}
+
+#image-preview img {
+    width: 200px;
+    height: auto;
+    border-radius: 12px;
+    margin-top: 10px;
+    border: 1px solid #2f3336;
 }
