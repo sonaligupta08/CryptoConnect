@@ -10,7 +10,6 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 	<script src="https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@3.1.1/dist/index.min.js"></script>
 
-
 	<title>Dashboard</title>
 </head>
 
@@ -18,21 +17,20 @@
 	<div class="container-fluid">
 		<div class="row outer">
 
-			<!--sidebar-->
+			<!-- Sidebar -->
 			<div class="col-md-3 sidebar d-none d-md-flex flex-column">
-				<h2 class="brand"><img src="bitcoin.png.png" alt="bitcoin" class="coin-img "></h2>
+				<h2 class="brand"><img src="bitcoin.png.png" alt="bitcoin" class="coin-img"></h2>
+
 				<div class="menu">
 					<ul>
-						<li><i class='bx bx-home'></i>Home</li>
-						<li><i class='bx bx-bell'></i>Notification</li>
-						<li><i class='bx bx-bell'></i>Messages</li>
+						<li><i class='bx bx-home'></i> Home</li>
+						<li><i class='bx bx-bell'></i> Notification</li>
+						<li><i class='bx bx-message'></i> Messages</li>
 						<li><i class='bx bx-group'></i> Communities</li>
-						<li><i class='bx bx-user'></i>profile</li>
+						<li onclick="window.location.href='profile.html'"><i class='bx bx-user'></i> Profile</li>
 					</ul>
 				</div>
 
-
-				<button class="post-btn">Post</button>
 
 				<div class="profile-section">
 					<div class="profile-pic">?</div>
@@ -44,35 +42,36 @@
 				</div>
 			</div>
 
-			<!--Main content-->
+			<!-- Main Content -->
 			<div class="col-12 col-md-6 content">
 				<h5>For You</h5>
-				<div class="for-you"></div>
+
 				<div class="divide">
 					<div class="profile-section">
 						<div class="profile-pic">?</div>
+
 						<textarea placeholder="What's happening?" id="input" rows="2"></textarea>
 
 						<input type="file" id="imageUpload" accept="image/*" style="display:none;">
 						<div id="image-preview"></div>
 					</div>
+
 					<div class="emojis">
 						<a onclick="document.getElementById('imageUpload').click()">
 							<i class="fa-regular fa-image"></i>
 						</a>
+
 						<a><i class='bx bx-smile'></i></a>
-						<a><i class='bx bx-photo-album'></i> </a>
-						<a><i class='bx bx-bar-chart-alt'></i></a>
-						<button class="post">Post</button>
+
+						<button class="post" type="button">Post</button>
 					</div>
 				</div>
+
 				<div id="post-feed"></div>
 			</div>
 
-
-
-			<!--right section-->
-			<div class="col-md-3 d-none d-md-block content-2" id="left">
+			<!-- Right Side -->
+			<div class="col-md-3 d-none d-md-block content-2">
 				<div class="connect-img">
 					<img src="connect.jpg" alt="connect">
 				</div>
@@ -82,6 +81,8 @@
 
 		</div>
 	</div>
+
+	<!-- Mobile Bottom Nav -->
 	<nav class="navbar navbar-dark bg-dark d-md-none fixed-bottom">
 		<div class="container justify-content-around">
 			<a href="#" class="text-light"><i class='bx bx-home'></i></a>
@@ -91,26 +92,23 @@
 		</div>
 	</nav>
 
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+	<!-- SCRIPT -->
 	<script>
-		const postBtn = document.querySelector(".post");
+
 		const inputBox = document.getElementById("input");
-		const postFeed = document.getElementById("post-feed");
 		const emojiBtn = document.querySelector(".bx-smile");
 		const picker = new EmojiButton();
+		const imageInput = document.getElementById("imageUpload");
+		let selectedImage = null;
 
-		picker.on('emoji', emoji => {
-			inputBox.value += emoji;
-		});
+		// Emoji picker
+		picker.on('emoji', emoji => inputBox.value += emoji);
 
 		emojiBtn.addEventListener('click', () => {
 			picker.togglePicker(emojiBtn);
 		});
 
-
-		const imageInput = document.getElementById("imageUpload");
-		let selectedImage = null;
-
+		// Image upload preview
 		imageInput.addEventListener("change", () => {
 			const file = imageInput.files[0];
 			if (!file) return;
@@ -118,51 +116,93 @@
 			const reader = new FileReader();
 			reader.onload = (e) => {
 				selectedImage = e.target.result;
-
-				document.getElementById("image-preview").innerHTML = `<img src="${selectedImage}">`;
+				document.getElementById("image-preview").innerHTML =
+					`<img src="${selectedImage}" class="posted-img">`;
 			};
 			reader.readAsDataURL(file);
 		});
 
-		postBtn.addEventListener("click", () => {
+		// Post Button
+		const postBtn = document.querySelector(".post");
+		const postFeed = document.getElementById("post-feed");
+
+		postBtn.addEventListener("click", async () => {
 
 			const text = inputBox.value.trim();
-
 			if (text === "") {
 				alert("Type something first");
 				return;
 			}
-			const postDiv = document.createElement("div");
-			postDiv.classList.add("post-card");
 
-			postDiv.innerHTML = `
-				<div class = "profile-section">
-					<div class="profile-pic">?</div>
-					<div>
-					      <p class="username">Guest</p>
-					      <p class="handle">@guest_user</p>
-					</div>
-				</div>
-				<p class="post-text">${text}</p>
+			const postData = {
+				userId: 1,
+				content: text,
+				imageUrl: selectedImage
+			};
 
-				${selectedImage ? `<img src="${selectedImage}" class="posted-img">` : ""}
+			const response = await fetch("http://localhost:8080/api/posts/create", {
+				method: "POST",
+				headers: {"Content-Type": "application/json"},
+				body: JSON.stringify(postData)
+			});
 
-				 <hr style="border-col5or:#2f3336;">
-            <div class="action-buttons">
-                 <button><i class='bx bx-heart'></i></button>
-                 <button><i class='bx bx-chat'></i></button>
-                 <button><i class='bx bx-share'></i></button>
-           </div>
-		   
-		 `;
-			postFeed.prepend(postDiv);
+			if (!response.ok) {
+				console.error("post failed: ", response.status);
+				alert("error while posting!");
+				return;
+			}
+
+			const savedPost = await response.json();
+			console.log("Saved Post:", savedPost);
+			displayPost(savedPost);
+
+			// Reset UI
 			inputBox.value = "";
 			selectedImage = null;
 			imageInput.value = "";
 			document.getElementById("image-preview").innerHTML = "";
-
 		});
+
+		/* Display Post Function */
+		function displayPost(post) {
+
+			const postDiv = document.createElement("div");
+			postDiv.classList.add("post-card");
+
+			postDiv.innerHTML = `
+                <div class="profile-section">
+                    <div class="profile-pic">?</div>
+                    <div>
+                        <p class="username">Guest</p>
+                        <p class="handle">@guest_user</p>
+                    </div>
+                </div>
+
+                <p class="post-text">${post.content}</p>
+
+                ${post.imageUrl ? `<img src="${post.imageUrl}" class="posted-img">` : ""}
+
+                <hr>
+                <div class="action-buttons">
+                    <button><i class='bx bx-heart'></i></button>
+                    <button><i class='bx bx-chat'></i></button>
+                    <button><i class='bx bx-share'></i></button>
+                </div>
+            `;
+
+			postFeed.prepend(postDiv);
+		}
+		async function loadAllPosts() {
+			const res = await fetch("http://localhost:8080/api/posts/all");
+			const posts = await res.json();
+
+			posts.forEach(p => displayPost(p));
+		}
+
+		loadAllPosts();
+
 	</script>
+
 </body>
 
 </html>

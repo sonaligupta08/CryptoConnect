@@ -52,24 +52,6 @@ body {
     color: #1d9bf0;
 }
 
-.post-btn {
-    background-color: #fff;
-    color: #000;
-    border: none;
-    border-radius: 50px;
-    font-weight: bold;
-    font-size: 1rem;
-    padding: 12px 0;
-    margin-top: 10px;
-    cursor: pointer;
-    width: 100%;
-    transition: 0.3s;
-}
-
-.post-btn:hover {
-    background-color: #d7dbdc;
-}
-
 .profile-section {
     display: flex;
     align-items: center;
