@@ -3,13 +3,8 @@ package com.example.cryproconnect.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import com.example.cryproconnect.CryproconnectApplication;
+import org.springframework.web.bind.annotation.*;
+
 import com.example.cryproconnect.entity.Post;
 import com.example.cryproconnect.repository.PostRepository;
 
@@ -17,28 +12,24 @@ import com.example.cryproconnect.repository.PostRepository;
 @RequestMapping("/api/posts")
 public class PostController {
 
-    private final CryproconnectApplication cryproconnectApplication;
+    @Autowired
+    private PostRepository postRepository;
 
-	@Autowired
-	PostRepository postRepository;
-
-    PostController(CryproconnectApplication cryproconnectApplication) {
-        this.cryproconnectApplication = cryproconnectApplication;
+    // Create a new post
+    @PostMapping("/create")
+    public Post createPost(@RequestBody Post post) {
+        return postRepository.save(post);
     }
 
-	@PostMapping("/create")
-	public Post createPost(@RequestBody Post post) {
-		return postRepository.save(post);
-	}
+    // Get all posts for a specific user
+    @GetMapping("/user/{userId}")
+    public List<Post> getUserPosts(@PathVariable Long userId) {
+        return postRepository.findByUserIdOrderByCreatedAtDesc(userId);
+    }
 
-	@GetMapping("/user/{userId}")
-	public List<Post> getUserPosts(@PathVariable Long userId) {
-		return postRepository.findByUserIdOrderByCreatedAtDesc(userId);
-	}
-
-	@GetMapping("/all")
-	public List<Post> getAllPosts() {
-		return postRepositoruserRepositorysc();
-	}
-
+    // Get all posts in the system
+    @GetMapping("/all")
+    public List<Post> getAllPosts() {
+        return postRepository.findAll();
+    }
 }

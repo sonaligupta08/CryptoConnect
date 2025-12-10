@@ -9,4 +9,5 @@ public class CryproconnectApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(CryproconnectApplication.class, args);
 	}
+	
 }
