@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <title>login page</title>
+    <style>
+        img {
+            height: 60px;
+            width: 60px;
+            border-radius: 50%;
+        }
+
+        .logo {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-top: 1.5rem;
+        }
+
+        #form-container {
+            max-width: 400px;
+            padding: 2rem;
+            border-radius: 10px;
+            background-color: #212529;
+            margin: 4rem auto;
+            background-color: rgb(102, 154, 136);
+        }
+
+        #or {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <div id="form-container" style="background-color: #0B4D99;">
+            <a href="index.html" class="btn-back"><i class="fa-solid fa-arrow-left"></i> go back</a>
+            <div class="logo">
+                <img src="bitcoin.png.png" alt="bitcoin" class="coin-img me-2">
+            </div>
+            <br>
+            <form action="#" method="post">
+                <div>
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="Enter your email" class="form-control"><br>
+                </div>
+
+                <div>
+                    <label for="password">password</label>
+                    <input type="password" id="password" placeholder="Enter your password" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mt-4">Login</button>
+                <a href="forget-password.html" class="d-block text-center mt-2 text-warning">Forget password?</a>
+                <p class="text-center text-white mt-3">
+                    Don't have an account? <a href="signup.html" class="text-info">signup</a>
+                </p>
+
+            </form>
+        </div>
+
+    </div>
+	
+	<script>
+		document.querySelector("form").addEventListener("submit",async (event) => {
+			event.preventDefault();
+			
+			const email = document.getElementById("email").value;
+			const password = document.getElementById("password").value;
+			
+			const response = await fetch("http://localhost:8080/api/auth/login",{
+				method: "POST",
+				headers: { "content-Type": "application/json"},
+				body: JSON.stringify({email, password}),
+			});
+			
+			const data = await response.json();
+			alert(data.message);
+			if (data.message === "Login successfull ! "){
+				window.location.href = "/dashboard";
+			}
+		});
+	</script>
+</body>
+
+</html>
