@@ -19,18 +19,31 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-		http.csrf(csrf -> csrf.disable()).cors(cors -> {
-		}).authorizeHttpRequests(auth -> auth
+		http
+		.csrf(csrf -> csrf.disable())
+		.cors(cors -> {})
+		.authorizeHttpRequests(auth -> auth
 
-				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll().requestMatchers("/api/auth/**").permitAll()
+				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+				
+				.requestMatchers("/api/auth/**").permitAll()
+				.requestMatchers("/api/posts/**").permitAll()
 
-				.requestMatchers("/", "/index.html", "/login", "/signup", "/login.html", "/signup.html", "/about.html")
+				.requestMatchers("/", "/index.html", "/login", "/signup", "/login.html", "/signup.html", "/about.html", "/dashboard.html", 
+						"/profile.html")
 				.permitAll()
 
-				.requestMatchers("/css/**", "/js/**", "/images/**", "/*.png", "/*.jpg").permitAll()
+				.requestMatchers(
+		                "/**/*.css",
+		                "/**/*.js",
+		                "/**/*.png",
+		                "/**/*.jpg",
+		                "/**/*.jpeg",
+		                "/favicon.ico"
+		            ).permitAll()
 
-				.anyRequest().authenticated()).formLogin(form -> form.disable());
-
+				.anyRequest().authenticated());
+		         
 		return http.build();
 	}
 }
