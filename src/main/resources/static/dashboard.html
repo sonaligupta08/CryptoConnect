@@ -377,7 +377,11 @@
 				return;
 			}
 
-			const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+			let currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+			if (!currentUser) {
+				currentUser = {id: 1};
+			}
 
 			const postData = {
 				userId: currentUser.id,
@@ -410,7 +414,9 @@
 
 		/* Display Post Function */
 		function displayPost(post) {
-			const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+			const currentUser =
+				JSON.parse(localStorage.getItem("currentUser")) || {id: -1};
+
 
 			const postDiv = document.createElement("div");
 			postDiv.classList.add("post-card");
@@ -433,15 +439,18 @@
                     <button><i class='bx bx-heart'></i></button>
                     <button><i class='bx bx-chat'></i></button>
                     <button><i class='bx bx-share'></i></button>
-					
-					${post.userId === currentUser.id ? `<button onclick="deletePost(${post.id}, this)">Delete</button>` : ""}
+					<button onclick="deletePost(${post.id}, this)">
+					  <i class='bx bx-trash'></i>
+					</button>
+
+
                 </div>
             `;
 
 			postFeed.prepend(postDiv);
 		}
 
-        //delete post btn
+		//delete post btn
 		async function deletePost(postId, btn) {  // pass the button element as btn
 			const confirmDelete = confirm("Delete this post?");
 			if (!confirmDelete) return;
@@ -462,11 +471,6 @@
 				alert("Error deleting post");
 			}
 		}
-
-
-		loadAllPosts();
-		loadProfilePosts();
-
 
 	</script>
 

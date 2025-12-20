@@ -30,7 +30,25 @@
 			background-color: #212529;
 			margin: 4rem auto;
 			background-color: rgb(102, 154, 136);
+
+			opacity: 0;
+			transform: translateY(40px);
+			animation: fade 2s ease forwards;
+			box-shadow: 0 0 30px rgb(159, 85, 85);
 		}
+
+		@keyframes fade {
+			from {
+				opacity: 0;
+				transform: translateY(40px);
+			}
+
+			to {
+				opacity: 2;
+				transform: translateY(60px);
+			}
+		}
+
 
 		#or {
 			text-align: center;
