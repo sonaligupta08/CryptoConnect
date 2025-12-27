@@ -2,13 +2,16 @@
 <html lang="en">
 
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="/index.css">
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
-	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-	<title>Cryptoconnect</title>
+	<!-- Bootstrap -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" />
+
+	<!-- Google Font -->
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+
+	<title>CryptoConnect</title>
 
 	<style>
 		body {
@@ -17,161 +20,113 @@
 			font-family: "Poppins", sans-serif;
 		}
 
+		/* ---------- TOP BAR ---------- */
+		.top-bar {
+			background-color: #0b4d99;
+			padding: 10px;
+			text-align: center;
+			font-size: 1.2rem;
+		}
+
+		/* ---------- NAVBAR ---------- */
 		#crypto {
 			color: #00bfff;
-			/* glowing sky blue */
 			text-shadow: 0 0 8px #00bfff;
 			font-weight: 700;
+			font-size: 1.6rem;
 		}
 
 		.coin-img {
+			height: 32px;
+			width: 32px;
 			border-radius: 50%;
-			height: 40px;
-			width: 60px;
-			object-fit: cover;
-			box-shadow: 0 0 50px rgba(63, 121, 227, 0.9);
-			animation: glow 2s infinite;
+			box-shadow: 0 0 20px rgba(63, 121, 227, 0.9);
 		}
 
-		@keyframes glow {
-			from {
-				box-shadow: 0 0 50px rgba(63, 121, 227, 0.9);
-			}
-
-			to {
-				box-shadow: 0 0 50px rgb(21, 80, 189);
-			}
+		.navbar {
+			background-color: white !important;
 		}
 
-		.navbar-dark .navbar-nav .nav-link:hover {
-			color: blue !important;
+		.navbar-nav .nav-link {
+			padding: 2px 8px !important;
+			color: #000 !important;
+			font-family: cursive;
+			font-weight: bold;
+			font-size: 20px;
 		}
 
-		.move-up {
-			transform: translateY(-50px);
+		.navbar-nav .nav-link:hover {
+			color: #00bfff !important;
 		}
 
-		.btn-back {
-			display: inline-block;
-			border: 2px solid black;
-			padding: 3px;
-			border-radius: 6px;
-			background-color: white;
-			color: black;
-			text-decoration: none;
+		/* ---------- HERO SECTION ---------- */
+		#text {
+			min-height: 100vh;
+			background-image: url("community.jpeg");
+			background-size: cover;
+			background-position: center;
+			position: relative;
+			padding: 40px 15px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
 			text-align: center;
-			cursor: pointer;
-			transition: 0.3s;
 		}
 
-		.btn-back:hover {
-			background-color: black;
-			color: white;
+		#text::before {
+			content: "";
+			position: absolute;
+			inset: 0;
+			background-color: rgba(0, 0, 0, 0.65);
+			z-index: 1;
 		}
 
-		.girl {
-			height: 250px;
-			width: 250px;
-			overflow: hidden;
-		}
-
-		.girl img {
+		.glass-card {
+			position: relative;
+			z-index: 2;
+			background: rgba(255, 255, 255, 0.08);
+			backdrop-filter: blur(10px);
+			border-radius: 16px;
+			padding: 35px;
+			max-width: 500px;
 			width: 100%;
-			height: 100%;
-			object-fit: cover;
-			animation: myanimation 2s ease-in-out infinite;
+			box-shadow: 0 0 40px rgba(0, 191, 255, 0.15);
 		}
 
-		@keyframes myanimation {
-			0% {
-				transform: scale(1);
-			}
-
-			50% {
-				transform: scale(1.3);
-			}
-
-			100% {
-				transform: scale(1);
-			}
+		.glass-card h2 {
+			color: #00bfff;
+			font-weight: 700;
+			margin-bottom: 15px;
 		}
 
-		.questions {
-			height: 20px;
-			width: 100%;
-			background-color: #738fc3;
+		.glass-card p {
+			color: #ccc;
+			font-size: 1rem;
 		}
 
 		.btn-success {
 			background-color: #00bfff;
 			border: none;
-			font-weight: bold;
 			color: #000;
-			transition: 0.3s;
-			margin-top: 20px;
+			font-weight: bold;
+			padding: 10px 25px;
+			margin-top: 15px;
 		}
 
 		.btn-success:hover {
 			background-color: #007bff;
-			color: white;
-			box-shadow: 0 0 10px #00bfff;
+			color: #fff;
+			box-shadow: 0 0 12px #00bfff;
 		}
 
-		#text {
-			background: radial-gradient(circle at top, #001f3f, #000);
-			text-align: center;
-			position: relative;
-			padding: 50px;
-			background-image: url("community.jpeg");
-		}
-
-		#text::before {
-			content: " ";
-			position: absolute;
-			inset: 0;
-			background-color: rgba(0, 0, 0, 0.6);
-			z-index: 1;
-		}
-
-		#text h2 {
-			color: #00bfff;
-			text-shadow: 0 0 10px #007bff;
-			font-weight: bold;
-		}
-
-		#text p {
-			color: #ccc;
-			max-width: 600px;
-			margin: auto;
-		}
-
-		#text h2,
-		#text p,
-		#text a {
-			position: relative;
-			z-index: 2;
-		}
-
-		.glass-card {
-			background-color: rgba(255, 255, 255, 0.08);
-			border-radius: 16px;
-			padding: 40px;
-			max-width: 500px;
-			box-shadow: 0 0 40px rgba(28, 53, 61, 0.2);
-		}
-
-
+		/* ---------- FEATURES ---------- */
 		.feature-box {
 			background: #050b14;
 			padding: 25px;
 			border-radius: 12px;
 			box-shadow: 0 0 20px rgba(0, 191, 255, 0.1);
 			transition: 0.3s;
-			color: wheat;
-
-			opacity: 0;
-			transform: translateY(20px);
-			animation: fadeUp 4s ease forwards;
+			height: 100%;
 		}
 
 		.feature-box:hover {
@@ -179,87 +134,109 @@
 			box-shadow: 0 0 30px rgba(0, 191, 255, 0.3);
 		}
 
-
-		@keyframes fadeUp {
-			from {
-				opacity: 0;
-				transform: translateY(20px);
+		/* ---------- RESPONSIVE ---------- */
+		@media (max-width: 576px) {
+			.top-bar {
+				font-size: 0.8rem;
 			}
 
-			to {
-				opacity: 1;
-				transform: translateY(0);
+			.glass-card {
+				padding: 25px;
+			}
+
+			.glass-card h2 {
+				font-size: 1.5rem;
+			}
+
+			.glass-card p {
+				font-size: 0.95rem;
+			}
+		}
+
+		/* MOBILE NAVBAR */
+		@media (max-width: 576px) {
+			.navbar {
+				padding-top: 4px !important;
+				padding-bottom: 4px !important;
+				min-height: auto !important;
+			}
+
+			.navbar-brand {
+				padding: 0 !important;
+			}
+
+			.navbar-brand img {
+				height: 26px;
+				width: 26px;
+			}
+
+			#crypto {
+				font-size: 1.2rem;
 			}
 		}
 	</style>
 </head>
 
 <body>
-	<div class="text-white " style="padding: 10px; background-color: #0B4D99; text-align: center;"> Join Our Crypto
-		Community</div>
-	<!-- Navbar -->
-	<nav class="navbar navbar-expand-lg navbar-dark px-4" id="header" style="background-color: white;">
+
+	<!-- TOP BAR -->
+	<div class="top-bar text-white">
+		Join Our Crypto Community
+	</div>
+
+	<!-- NAVBAR -->
+	<nav class="navbar navbar-expand-lg navbar-light">
 		<div class="container-fluid">
-			<!-- Logo + Title -->
-			<a class="navbar-brand fw-bold fs-3 d-flex align-content-between" href="#">
-				<img src="bitcoin.png.png" alt="bitcoin" class="coin-img me-2 "><br>
+			<a class="navbar-brand d-flex align-items-center" href="#">
+				<img src="bitcoin.png.png" class="coin-img me-2" alt="logo" />
 				<span id="crypto">CryptoConnect</span>
 			</a>
 
-			<!-- Hamburger button -->
-			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-				aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
 				<span class="navbar-toggler-icon"></span>
 			</button>
 
-			<!-- Links -->
 			<div class="collapse navbar-collapse justify-content-end" id="navbarNav">
 				<ul class="navbar-nav">
-					<li class="nav-item">
-						<a class="nav-link text-black fw-bold" href="#">Home</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link text-black fw-bold " href="login.html">Login</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link text-black fw-bold" href="about.html">About</a>
-					</li>
+					<li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+					<li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
+					<li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
 				</ul>
 			</div>
 		</div>
 	</nav>
 
-
-	<div class="d-flex flex-column justify-content-center align-items-center min-vh-100" id="text">
-		<!-- <div class="girl">
-      <img src="crypto.png" alt="null" height="300px" width="300px">
-    </div> -->
-		<div class="glass-card text-center" style="color: white;">
-			<h2 style="color: white;">Welcome to Cryptoconnect</h2>
+	<!-- HERO -->
+	<section id="text">
+		<div class="glass-card">
+			<h2>Welcome to CryptoConnect</h2>
 			<p>
-				Join the ultimate community for crypto enthusiasts! Share, discuss, and stay updated on #BTC, #ETH, and
-				more.
+				Join the ultimate community for crypto enthusiasts.
+				Share, discuss, and stay updated on BTC, ETH, and more.
 			</p>
 			<a href="signup.html">
 				<button class="btn btn-success">Get Started</button>
 			</a>
 		</div>
-	</div>
+	</section>
 
+	<!-- FEATURES -->
 	<section class="container my-5">
-		<div class="row text-center g-4" style="background-color: #000;">
+		<div class="row g-4 text-center">
 			<div class="col-md-4">
 				<div class="feature-box">
 					<h5>🔒 Secure</h5>
 					<p>Blockchain-backed data integrity & safety.</p>
 				</div>
 			</div>
+
 			<div class="col-md-4">
 				<div class="feature-box">
 					<h5>💬 Community</h5>
 					<p>Connect with real crypto enthusiasts.</p>
 				</div>
 			</div>
+
 			<div class="col-md-4">
 				<div class="feature-box">
 					<h5>⚡ Fast</h5>

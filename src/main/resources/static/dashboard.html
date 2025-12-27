@@ -338,6 +338,25 @@
 	<!-- SCRIPT -->
 	<script>
 
+		const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+		if (!currentUser) {
+			alert("Please login first");
+			window.location.href = "login.html";
+		}
+
+		document.querySelectorAll(".username").forEach(el => {
+			el.innerText = currentUser.name;
+		});
+
+		document.querySelectorAll(".handle").forEach(el => {
+			el.innerText = "@" + currentUser.username;
+		});
+
+		document.querySelectorAll(".profile-pic").forEach(el => {
+			el.innerText = currentUser.name.charAt(0).toUpperCase();
+		});
+
 		const inputBox = document.getElementById("input");
 		const emojiBtn = document.querySelector(".bx-smile");
 		const picker = new EmojiButton();
@@ -377,11 +396,6 @@
 				return;
 			}
 
-			let currentUser = JSON.parse(localStorage.getItem("currentUser"));
-
-			if (!currentUser) {
-				currentUser = {id: 1};
-			}
 
 			const postData = {
 				userId: currentUser.id,
@@ -425,8 +439,8 @@
                 <div class="profile-section">
                     <div class="profile-pic">?</div>
                     <div>
-						<p class="username">${post.username || "Guest"}</p>
-                        <p class="handle">@guest_user</p>
+						<p class="username">${post.username || currentUser.name}</p>
+					<p class="handle">@${currentUser.username}</p>
                     </div>
                 </div>
 
@@ -439,9 +453,11 @@
                     <button><i class='bx bx-heart'></i></button>
                     <button><i class='bx bx-chat'></i></button>
                     <button><i class='bx bx-share'></i></button>
+					
+					${currentUser.id === post.userId ? `
 					<button onclick="deletePost(${post.id}, this)">
 					  <i class='bx bx-trash'></i>
-					</button>
+					</button>` : ""}
 
 
                 </div>
@@ -451,26 +467,30 @@
 		}
 
 		//delete post btn
-		async function deletePost(postId, btn) {  // pass the button element as btn
-			const confirmDelete = confirm("Delete this post?");
-			if (!confirmDelete) return;
+		async function deletePost(postId, btn) {
 
-			try {
-				const res = await fetch(`http://localhost:8080/api/posts/${postId}`, {
-					method: "DELETE"
-				});
+			const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+			if (!currentUser) return;
 
-				if (res.ok) {
-					// remove the specific post card from the feed
-					btn.closest(".post-card").remove();
-				} else {
-					alert("Failed to delete post");
-				}
-			} catch (error) {
-				console.error("Error deleting post:", error);
-				alert("Error deleting post");
+			const ok = confirm("Delete this post?");
+			if (!ok) return;
+
+			const res = await fetch(
+				`http://localhost:8080/api/posts/${postId}/user/${currentUser.id}`,
+				{method: "DELETE"}
+			);
+
+			if (res.ok) {
+				btn.closest(".post-card").remove();
 			}
 		}
+
+
+		window.onload = async () => {
+			const res = await fetch("http://localhost:8080/api/posts/all");
+			const posts = await res.json();
+			posts.forEach(displayPost);
+		};
 
 	</script>
 

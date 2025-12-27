@@ -1,5 +1,7 @@
 package com.example.cryptoconnect.config;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -7,43 +9,71 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 public class SecurityConfig {
 
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
 
-		http
-		.csrf(csrf -> csrf.disable())
-		.cors(cors -> {})
-		.authorizeHttpRequests(auth -> auth
+        config.setAllowedOrigins(List.of(
+                "http://localhost:5500",
+                "http://127.0.0.1:5500"
+        ));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
 
-				.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-				
-				.requestMatchers("/api/auth/**").permitAll()
-				.requestMatchers("/api/posts/**").permitAll()
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
 
-				.requestMatchers("/", "/index.html", "/login", "/signup", "/login.html", "/signup.html", "/about.html", "/dashboard.html", 
-						"/profile.html")
-				.permitAll()
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-				.requestMatchers(
-		                "/**/*.css",
-		                "/**/*.js",
-		                "/**/*.png",
-		                "/**/*.jpg",
-		                "/**/*.jpeg",
-		                "/favicon.ico"
-		            ).permitAll()
+        http
+            .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .authorizeHttpRequests(auth -> auth
 
-				.anyRequest().authenticated());
-		         
-		return http.build();
-	}
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/posts/**").permitAll()
+
+                .requestMatchers(
+                        "/",
+                        "/index.html",
+                        "/login.html",
+                        "/signup.html",
+                        "/dashboard.html",
+                        "/profile.html",
+                        "/about.html"
+                ).permitAll()
+
+                .requestMatchers(
+                        "/**/*.css",
+                        "/**/*.js",
+                        "/**/*.png",
+                        "/**/*.jpg",
+                        "/**/*.jpeg",
+                        "/favicon.ico"
+                ).permitAll()
+
+                .anyRequest().authenticated()
+            );
+
+        return http.build();
+    }
 }

@@ -1,9 +1,11 @@
 package com.example.cryptoconnect.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.cryptoconnect.entity.Post;
@@ -35,9 +37,24 @@ public class PostController {
 		return postRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
 	}
 
-	@DeleteMapping("/{id}")
-	public void deletePost(@PathVariable Long id) {
-		postRepository.deleteById(id);
+	@DeleteMapping("/{id}/user/{userId}")
+	public ResponseEntity<String> deletePost(
+	        @PathVariable Long id,
+	        @PathVariable Long userId) {
+
+	    Optional<Post> post = postRepository.findById(id);
+
+	    if (post.isEmpty()) {
+	        return ResponseEntity.notFound().build();
+	    }
+
+	    if (!post.get().getUserId().equals(userId)) {
+	        return ResponseEntity.status(403).body("Forbidden");
+	    }
+
+	    postRepository.deleteById(id);
+	    return ResponseEntity.ok("Deleted");
 	}
+
 
 }

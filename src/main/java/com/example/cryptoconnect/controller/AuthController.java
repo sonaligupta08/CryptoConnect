@@ -38,12 +38,18 @@ public class AuthController {
 	}
 
 	@PostMapping("/login")
-	public Map<String, String> login(@RequestBody User user) {
+	public Map<String, Object> login(@RequestBody User user) {
 
 		Optional<User> dbUser = userRepository.findByEmail(user.getEmail());
 
 		if (dbUser.isPresent() && encoder.matches(user.getPassword(), dbUser.get().getPassword())) {
-			return Map.of("message", "Login successful!");
+
+			Map<String, Object> response = new HashMap<>();
+			response.put("message", "Login successful");
+			response.put("userId", dbUser.get().getId());
+			response.put("email", dbUser.get().getEmail());
+
+			return response;
 		}
 
 		return Map.of("message", "Invalid email or password");
