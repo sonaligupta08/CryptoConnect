@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.example.cryptoconnect.entity.User;
 import com.example.cryptoconnect.repository.UserRepository;
 
+
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -48,7 +51,7 @@ public class AuthController {
 			response.put("message", "Login successful");
 			response.put("userId", dbUser.get().getId());
 			response.put("email", dbUser.get().getEmail());
-
+			response.put("username", dbUser.get().getUsername());
 			return response;
 		}
 

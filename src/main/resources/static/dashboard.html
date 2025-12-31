@@ -337,162 +337,99 @@
 
 	<!-- SCRIPT -->
 	<script>
+		// Get logged-in user
+		const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
 
-		const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-
-		if (!currentUser) {
+		if (!currentUser.username) {
 			alert("Please login first");
 			window.location.href = "login.html";
 		}
 
-		document.querySelectorAll(".username").forEach(el => {
-			el.innerText = currentUser.name;
+		// Update user info
+		document.querySelectorAll(".username").forEach(el => el.innerText = currentUser.username);
+		document.querySelectorAll(".handle").forEach(el => el.innerText = "@" + currentUser.username);
+		document.querySelectorAll(".profile-pic").forEach(el => el.innerText = currentUser.username.charAt(0).toUpperCase());
+
+		// Load posts
+		async function loadPosts() {
+			try {
+				const res = await fetch(`http://localhost:8080/api/posts/user/${currentUser.id}`);
+				const posts = await res.json();
+				const container = document.getElementById("post-feed");
+				container.innerHTML = "";
+
+				posts.forEach(post => {
+					const div = document.createElement("div");
+					div.className = "post-card";
+					div.innerHTML = `
+		                <div class="profile-section">
+		                    <div class="profile-pic">${currentUser.username.charAt(0).toUpperCase()}</div>
+		                    <div>
+		                        <p class="username">${currentUser.username}</p>
+		                        <p class="handle">@${currentUser.username}</p>
+		                    </div>
+		                </div>
+		                <p class="post-text">${post.content}</p>
+		                ${post.imageUrl ? `<img src="${post.imageUrl}" style="width:100%; border-radius:12px;">` : ""}
+		            `;
+					container.appendChild(div);
+				});
+
+			} catch (err) {
+				console.error("Failed to load posts", err);
+			}
+		}
+
+		// Post new content
+		document.querySelector(".post").addEventListener("click", async () => {
+			const content = document.getElementById("input").value.trim();
+			if (!content) return alert("Write something to post!");
+
+			try {
+				const res = await fetch("http://localhost:8080/api/posts/create", {
+					method: "POST",
+					headers: {"Content-Type": "application/json"},
+					body: JSON.stringify({
+						userId: currentUser.id,
+						username: currentUser.username,
+						content: content,
+						imageUrl: selectedImage || null
+					})
+				});
+
+				if (res.ok) {
+					document.getElementById("input").value = "";
+					document.getElementById("image-preview").innerHTML = "";
+					selectedImage = null;
+					loadPosts();
+				}
+
+			} catch (err) {
+				console.error("Failed to post", err);
+			}
 		});
 
-		document.querySelectorAll(".handle").forEach(el => {
-			el.innerText = "@" + currentUser.username;
-		});
-
-		document.querySelectorAll(".profile-pic").forEach(el => {
-			el.innerText = currentUser.name.charAt(0).toUpperCase();
-		});
-
-		const inputBox = document.getElementById("input");
-		const emojiBtn = document.querySelector(".bx-smile");
-		const picker = new EmojiButton();
+		// Image preview
 		const imageInput = document.getElementById("imageUpload");
 		let selectedImage = null;
 
-		// Emoji picker
-		picker.on('emoji', emoji => inputBox.value += emoji);
-
-		emojiBtn.addEventListener('click', () => {
-			picker.togglePicker(emojiBtn);
-		});
-
-		// Image upload preview
 		imageInput.addEventListener("change", () => {
 			const file = imageInput.files[0];
 			if (!file) return;
 
 			const reader = new FileReader();
-			reader.onload = (e) => {
+			reader.onload = e => {
 				selectedImage = e.target.result;
-				document.getElementById("image-preview").innerHTML =
-					`<img src="${selectedImage}" class="posted-img">`;
+				document.getElementById("image-preview").innerHTML = `<img src="${selectedImage}">`;
 			};
 			reader.readAsDataURL(file);
 		});
 
-		// Post Button
-		const postBtn = document.querySelector(".post");
-		const postFeed = document.getElementById("post-feed");
-
-		postBtn.addEventListener("click", async () => {
-
-			const text = inputBox.value.trim();
-			if (text === "" && !selectedImage) {
-				alert("Type something first");
-				return;
-			}
-
-
-			const postData = {
-				userId: currentUser.id,
-				content: text,
-				imageUrl: selectedImage
-			};
-
-			const response = await fetch("http://localhost:8080/api/posts/create", {
-				method: "POST",
-				headers: {"Content-Type": "application/json"},
-				body: JSON.stringify(postData)
-			});
-
-			if (!response.ok) {
-				console.error("post failed: ", response.status);
-				alert("error while posting!");
-				return;
-			}
-
-			const savedPost = await response.json();
-			console.log("Saved Post:", savedPost);
-			displayPost(savedPost);
-
-			// Reset UI
-			inputBox.value = "";
-			selectedImage = null;
-			imageInput.value = "";
-			document.getElementById("image-preview").innerHTML = "";
-		});
-
-		/* Display Post Function */
-		function displayPost(post) {
-			const currentUser =
-				JSON.parse(localStorage.getItem("currentUser")) || {id: -1};
-
-
-			const postDiv = document.createElement("div");
-			postDiv.classList.add("post-card");
-
-			postDiv.innerHTML = `
-                <div class="profile-section">
-                    <div class="profile-pic">?</div>
-                    <div>
-						<p class="username">${post.username || currentUser.name}</p>
-					<p class="handle">@${currentUser.username}</p>
-                    </div>
-                </div>
-
-                <p class="post-text">${post.content}</p>
-
-                ${post.imageUrl ? `<img src="${post.imageUrl}" class="posted-img">` : ""}
-
-                <hr>
-                <div class="action-buttons">
-                    <button><i class='bx bx-heart'></i></button>
-                    <button><i class='bx bx-chat'></i></button>
-                    <button><i class='bx bx-share'></i></button>
-					
-					${currentUser.id === post.userId ? `
-					<button onclick="deletePost(${post.id}, this)">
-					  <i class='bx bx-trash'></i>
-					</button>` : ""}
-
-
-                </div>
-            `;
-
-			postFeed.prepend(postDiv);
-		}
-
-		//delete post btn
-		async function deletePost(postId, btn) {
-
-			const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-			if (!currentUser) return;
-
-			const ok = confirm("Delete this post?");
-			if (!ok) return;
-
-			const res = await fetch(
-				`http://localhost:8080/api/posts/${postId}/user/${currentUser.id}`,
-				{method: "DELETE"}
-			);
-
-			if (res.ok) {
-				btn.closest(".post-card").remove();
-			}
-		}
-
-
-		window.onload = async () => {
-			const res = await fetch("http://localhost:8080/api/posts/all");
-			const posts = await res.json();
-			posts.forEach(displayPost);
-		};
+		// Initial load
+		loadPosts();
 
 	</script>
+
 
 </body>
 
