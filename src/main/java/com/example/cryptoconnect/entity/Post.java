@@ -14,8 +14,9 @@ public class Post {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private Long userId;
-	private String username;
+	
+	private Long userId;  //owner id
+	private String username; //owner name
 	private String content;
 	@Lob
 	private String imageUrl;
