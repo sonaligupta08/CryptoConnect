@@ -212,7 +212,13 @@
 
 		// Fetch posts of this user from backend
 		async function loadUserPosts() {
-			const userId = 1; // your logged-in user (temporary)
+			const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+			
+			if(!currentUser || !currentUser.id){
+				alert("please login first");
+				window.location.href = "login.html";
+			}
+			const userId = currentUser.id;
 
 			try {
 				const response = await fetch(`http://localhost:8080/api/posts/user/${userId}`);
@@ -232,8 +238,9 @@
 		                        style="width:40px; height:40px; border-radius:50%; background:#333; text-align:center; line-height:40px;">
 		                        ?
 		                    </div>
-		                    <div>
+		                    <div style="display:flex>
 		                        <p style="margin:0; font-weight:600;">Guest User</p>
+								<i class='bx bx-trash-alt'></i> 
 		                        <p style="margin:0; color:#777;">@guest_user</p>
 		                    </div>
 		                </div>
