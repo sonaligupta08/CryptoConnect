@@ -21,26 +21,37 @@ import com.example.cryptoconnect.repository.PostRepository;
 @RequestMapping("/api/posts")
 public class PostController {
 
-@Autowired	
-private PostRepository postRepository;
-
+	@Autowired
+	private PostRepository postRepository;
 
 //creating post
-@PostMapping("/create")
-public Post createPost(@RequestBody Post post) {
-	return postRepository.save(post);
-}
+	@PostMapping("/create")
+	public Post createPost(@RequestBody Post post) {
+		return postRepository.save(post);
+	}
 
 //get post of a user
-@GetMapping("/user/{userId}")
-public List<Post> getPostByUser(@PathVariable Long userId){
-	return postRepository.findByUserId(userId);
-}
+	@GetMapping("/user/{userId}")
+	public List<Post> getPostByUser(@PathVariable Long userId) {
+		return postRepository.findByUserId(userId);
+	}
+
 //delete post
-@DeleteMapping("/{postId}")
-public ResponseEntity<?> deletePost(@PathVariable Long postId) {
-    postRepository.deleteById(postId);
-    return ResponseEntity.ok().build();
-}
+	@DeleteMapping("/{postId}/user/{userId}")
+	public ResponseEntity<?> deletePost(@PathVariable Long postId, @PathVariable Long userId) {
+
+		Post post = postRepository.findById(postId).orElse(null);
+
+		if (post == null) {
+			return ResponseEntity.notFound().build();
+		}
+
+		if (!post.getUserId().equals(userId)) {
+			return ResponseEntity.status(403).body("Not allowed");
+		}
+
+		postRepository.deleteById(postId);
+		return ResponseEntity.ok().build();
+	}
 
 }
