@@ -130,9 +130,11 @@
 
 					<div class="profile-info">
 						<img src="profile.jpg" class="profile-dp">
-						<h2 class="profile-name">Guest User</h2>
-						<p class="profile-handle">@guest_user</p>
-						<p class="profile-bio" id="displayBio">your bio here...</p>
+						<h2 class="profile-name" id="profileName"></h2>
+						<p class="profile-handle" id="profileHandle"></p>
+						
+						<p class="profile-bio" id="displayBio"></p>
+						
 					</div>
 				</div>
 
@@ -162,6 +164,8 @@
 				location.href = "login.html";
 				return;
 			}
+			document.getElementById("profileName").innerHTML = currentUser.username;
+			document.getElementById("profileHandle").innerHTML = "@" + currentUser.username;
 
 			try {
 				const res = await fetch(`http://localhost:8080/api/posts/user/${currentUser.id}`);
