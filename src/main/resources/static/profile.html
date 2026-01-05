@@ -132,9 +132,9 @@
 						<img src="profile.jpg" class="profile-dp">
 						<h2 class="profile-name" id="profileName"></h2>
 						<p class="profile-handle" id="profileHandle"></p>
-						
+
 						<p class="profile-bio" id="displayBio"></p>
-						
+
 					</div>
 				</div>
 
@@ -220,7 +220,18 @@
 				${post.imageUrl ? `<img src="${post.imageUrl}" style="width:100%;border-radius:10px">` : ""}
 
 				<div style="display:flex;gap:20px;margin-top:10px;font-size:1.2rem">
-					<i class='bx bx-heart'></i>
+					<i class='bx bx-heart'
+					   onclick="toggleLike(${post.id})"
+					   id="like-${post.id}"
+					   style="cursor:pointer"></i>
+
+					   <span onclick="showLikedUsers(${post.id})"
+					         style="cursor:pointer;color:#1d9bf0"
+					         id="like-count-${post.id}">
+					   </span>
+
+
+					
 					<i class='bx bx-chat'></i>
 					<i class='bx bx-share'></i>
 				</div>
@@ -250,6 +261,44 @@
 		}
 
 		loadUserPosts();
+
+
+		async function toggleLike(postId) {
+
+			const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+			await fetch("http://localhost:8080/api/likes/toggle", {
+				method: "POST",
+				headers: {"Content-Type": "application/json"},
+				body: JSON.stringify({
+					postId: postId,
+					userId: currentUser.id,
+					username: currentUser.username
+				})
+			});
+			
+		}
+
+		async function loadLikeCount(postId) {
+			const res = await fetch(`http://localhost:8080/api/likes/count/${postId}`);
+			const count = await res.text();
+
+			document.getElementById(`like-count-${postId}`).innerText = count;
+		}
+		
+
+		async function showLikedUsers(postId) {
+
+			const res = await fetch(`http://localhost:8080/api/likes/users/${postId}`);
+			const users = await res.json();
+
+			let names = users.map(u => u.username).join("\n");
+
+			alert(names || "No likes yet");
+		}
+
+
+
 	</script>
 
 </body>
