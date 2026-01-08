@@ -53,5 +53,11 @@ public class PostController {
 		postRepository.deleteById(postId);
 		return ResponseEntity.ok().build();
 	}
+	
+	//get all posts
+	@GetMapping("/all")
+	public List<Post> getAllPosts() {
+		return postRepository.findAll();
+	}
 
 }

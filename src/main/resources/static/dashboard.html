@@ -353,8 +353,9 @@
 		// Load posts
 		async function loadPosts() {
 			try {
-				const res = await fetch(`http://localhost:8080/api/posts/user/${currentUser.id}`);
+				const res = await fetch(`http://localhost:8080/api/posts/all`);
 				const posts = await res.json();
+				
 				const container = document.getElementById("post-feed");
 				container.innerHTML = "";
 
@@ -363,22 +364,68 @@
 					div.className = "post-card";
 					div.innerHTML = `
 		                <div class="profile-section">
-		                    <div class="profile-pic">${currentUser.username.charAt(0).toUpperCase()}</div>
+		                    <div class="profile-pic">${post.username.charAt(0).toUpperCase()}</div>
 		                    <div>
-		                        <p class="username">${currentUser.username}</p>
-		                        <p class="handle">@${currentUser.username}</p>
+		                        <p class="username">${post.username}</p>
+		                        <p class="handle">@${post.username}</p>
 		                    </div>
 		                </div>
 		                <p class="post-text">${post.content}</p>
 		                ${post.imageUrl ? `<img src="${post.imageUrl}" style="width:100%; border-radius:12px;">` : ""}
+						
+						<div class="action-buttons">
+											<button onclick="toggleLike(${post.id})">
+												<i class='bx bx-heart' id="like-icon-${post.id}"></i>
+											</button>
+
+											<span id="like-count-${post.id}" style="cursor:pointer"></span>
+					   </div>
 		            `;
+
 					container.appendChild(div);
+					loadLikeStatus(post.id);
+					loadLikeCount(post.id);
 				});
 
 			} catch (err) {
 				console.error("Failed to load posts", err);
 			}
 		}
+		async function toggleLike(postId) {
+			await fetch("http://localhost:8080/api/likes/toggle", {
+				method: "POST",
+				headers: {"Content-Type": "application/json"},
+				body: JSON.stringify({
+					postId: postId,
+					userId: currentUser.id,
+					username: currentUser.username
+				})
+			});
+
+			loadLikeStatus(postId);
+			loadLikeCount(postId);
+		}
+
+		async function loadLikeCount(postId) {
+			const res = await fetch(`http://localhost:8080/api/likes/count/${postId}`);
+			const count = await res.text();
+
+			document.getElementById(`like-count-${postId}`).innerText = count + " Likes";
+		}
+
+		async function loadLikeStatus(postId) {
+			const res = await fetch(
+				`http://localhost:8080/api/likes/status/${postId}/${currentUser.id}`
+			);
+
+			const liked = await res.json();
+			const icon = document.getElementById(`like-icon-${postId}`);
+
+			icon.className = liked ? "bx bxs-heart" : "bx bx-heart";
+			icon.style.color = liked ? "#ff4d4d" : "white";
+		}
+
+
 
 		// Post new content
 		document.querySelector(".post").addEventListener("click", async () => {

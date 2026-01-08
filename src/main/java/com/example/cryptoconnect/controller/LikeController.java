@@ -25,6 +25,10 @@ public class LikeController {
 	@PostMapping("/toggle")
 	public void toggleLike(@RequestBody PostLike like) {
 
+		if (like.getPostId() == null || like.getUserId() == null) {
+			return;
+		}
+
 		var existing = likeRepo.findByPostIdAndUserId(like.getPostId(), like.getUserId());
 
 		if (existing.isPresent()) {
@@ -32,10 +36,9 @@ public class LikeController {
 		} else {
 			likeRepo.save(like);
 		}
-
 	}
 
-	// count likes
+
 
 	// Count likes
 	@GetMapping("/count/{postId}")
@@ -48,4 +51,11 @@ public class LikeController {
 	public List<PostLike> likedUsers(@PathVariable Long postId) {
 		return likeRepo.findByPostId(postId);
 	}
+
+	@GetMapping("/status/{postId}/{userId}")
+	public boolean likeStatus(@PathVariable Long postId, @PathVariable Long userId) {
+
+		return likeRepo.findByPostIdAndUserId(postId, userId).isPresent();
+	}
+
 }
