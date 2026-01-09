@@ -60,7 +60,8 @@ public class SecurityConfig {
                         "/signup.html",
                         "/dashboard.html",
                         "/profile.html",
-                        "/about.html"
+                        "/about.html",
+                        "/communities.html"
                 ).permitAll()
 
                 .requestMatchers(

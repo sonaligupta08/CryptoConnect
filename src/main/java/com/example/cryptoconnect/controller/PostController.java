@@ -52,6 +52,8 @@ public class PostController {
 
 		postRepository.deleteById(postId);
 		return ResponseEntity.ok().build();
+		
+		
 	}
 	
 	//get all posts
@@ -59,5 +61,7 @@ public class PostController {
 	public List<Post> getAllPosts() {
 		return postRepository.findAll();
 	}
+	
+	
 
 }

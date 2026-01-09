@@ -269,7 +269,11 @@
 						<li><i class='bx bx-home'></i> Home</li>
 						<li><i class='bx bx-bell'></i> Notification</li>
 						<li><i class='bx bx-message'></i> Messages</li>
-						<li><i class='bx bx-group'></i> Communities</li>
+						
+						<li onclick="openCommunities()">
+							<i class='bx bx-group'></i> Communities
+						</li>
+						
 						<li onclick="window.location.href='profile.html'"><i class='bx bx-user'></i> Profile</li>
 					</ul>
 				</div>
@@ -474,6 +478,10 @@
 
 		// Initial load
 		loadPosts();
+		
+		function openCommunities() {
+			window.location.href = "communities.html";
+		}
 
 	</script>
 

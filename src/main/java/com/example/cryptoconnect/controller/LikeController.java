@@ -3,16 +3,12 @@ package com.example.cryptoconnect.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import com.example.cryptoconnect.entity.Post;
 import com.example.cryptoconnect.entity.PostLike;
 import com.example.cryptoconnect.repository.PostLikeRepository;
+import com.example.cryptoconnect.repository.PostRepository;
 
 @RestController
 @RequestMapping("/api/likes")
@@ -22,12 +18,14 @@ public class LikeController {
 	@Autowired
 	private PostLikeRepository likeRepo;
 
+	@Autowired
+	private PostRepository postRepo;
+
 	@PostMapping("/toggle")
 	public void toggleLike(@RequestBody PostLike like) {
 
-		if (like.getPostId() == null || like.getUserId() == null) {
+		if (like.getPostId() == null || like.getUserId() == null)
 			return;
-		}
 
 		var existing = likeRepo.findByPostIdAndUserId(like.getPostId(), like.getUserId());
 
@@ -38,13 +36,11 @@ public class LikeController {
 		}
 	}
 
-	// Count likes
 	@GetMapping("/count/{postId}")
 	public Long likeCount(@PathVariable Long postId) {
 		return likeRepo.countByPostId(postId);
 	}
 
-	// Who liked
 	@GetMapping("/users/{postId}")
 	public List<PostLike> likedUsers(@PathVariable Long postId) {
 		return likeRepo.findByPostId(postId);
@@ -61,4 +57,15 @@ public class LikeController {
 		return likeRepo.findByUserId(userId).stream().map(PostLike::getPostId).toList();
 	}
 
+	
+	@GetMapping("/posts/liked/{userId}")
+	public List<Post> getLikedPosts(@PathVariable Long userId) {
+
+		List<Long> postIds = likeRepo.findByUserId(userId).stream().map(PostLike::getPostId).toList();
+
+		if (postIds.isEmpty())
+			return List.of();
+
+		return postRepo.findByIdIn(postIds);
+	}
 }
