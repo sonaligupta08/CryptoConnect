@@ -38,8 +38,6 @@ public class LikeController {
 		}
 	}
 
-
-
 	// Count likes
 	@GetMapping("/count/{postId}")
 	public Long likeCount(@PathVariable Long postId) {
@@ -56,6 +54,11 @@ public class LikeController {
 	public boolean likeStatus(@PathVariable Long postId, @PathVariable Long userId) {
 
 		return likeRepo.findByPostIdAndUserId(postId, userId).isPresent();
+	}
+
+	@GetMapping("/user/{userId}")
+	public List<Long> likedPostIds(@PathVariable Long userId) {
+		return likeRepo.findByUserId(userId).stream().map(PostLike::getPostId).toList();
 	}
 
 }
