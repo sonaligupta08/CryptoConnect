@@ -52,6 +52,10 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/posts/**").permitAll()
                 .requestMatchers("/api/likes/**").permitAll()
+                .requestMatchers("/api/community/**").permitAll() 
+                .requestMatchers("/api/community/member-count/**").permitAll()
+                .requestMatchers("/api/community/is-member/**").permitAll()
+
 
                 .requestMatchers(
                         "/",

@@ -34,7 +34,15 @@ public class CommunityController {
     
     @PostMapping("/create")
     public Community create(@RequestBody Community community) {
-        return communityRepo.save(community);
+       
+    	Community saved = communityRepo.save(community);
+    	
+    	CommunityMember member = new CommunityMember();
+    	member.setCommunityId(saved.getId());
+    	member.setUserId(community.getAdminId());
+    	
+    	memberRepo.save(member);
+    	return saved;
     }
 
   
@@ -49,4 +57,23 @@ public class CommunityController {
     public List<CommunityMember> userCommunities(@PathVariable Long userId) {
         return memberRepo.findByUserId(userId);
     }
+    
+    @GetMapping("/all")
+    public List<Community> getAll() {
+        return communityRepo.findAll();
+    }
+    
+ 
+    @GetMapping("/member-count/{communityId}")
+    public int getMemberCount(@PathVariable Long communityId) {
+        return memberRepo.countByCommunityId(communityId); 
+    }
+
+    
+    @GetMapping("/is-member/{communityId}/{userId}")
+    public boolean isMember(@PathVariable Long communityId, @PathVariable Long userId) {
+        return memberRepo.existsByCommunityIdAndUserId(communityId, userId); 
+    }
+
+
 }

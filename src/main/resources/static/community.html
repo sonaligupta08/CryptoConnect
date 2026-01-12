@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+	rel="stylesheet">
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+	rel="stylesheet">
+
+<title>Community</title>
+
+<style>
+body {
+	background: #000;
+	color: #fff;
+	font-family: Poppins, sans-serif;
+}
+
+.post-box textarea {
+	width: 100%;
+	background: transparent;
+	border: none;
+	color: white;
+	resize: none;
+	outline: none;
+}
+
+.post-card {
+	border-bottom: 1px solid #2f3336;
+	padding: 1rem;
+}
+
+.post-btn {
+	background: #1d9bf0;
+	border: none;
+	padding: 8px 20px;
+	border-radius: 50px;
+	color: white;
+	font-weight: 600;
+}
+</style>
+</head>
+
+<body>
+	<div class="container mt-4">
+
+		<button class="btn btn-outline-light mb-3" onclick="history.back()">←
+			Back</button>
+
+		<h4 id="community-name"></h4>
+
+		<!-- Post box -->
+		<div class="post-box border p-3 rounded mb-4">
+			<textarea id="content" rows="2"
+				placeholder="Post something in this community..."></textarea>
+			<button class="post-btn mt-2" onclick="createPost()">Post</button>
+		</div>
+
+		<!-- Posts -->
+		<div id="posts"></div>
+
+	</div>
+
+	<script>
+	
+	async function checkMembership() {
+	    const res = await fetch(`http://localhost:8080/api/community/is-member/${communityId}/${currentUser.id}`);
+	    
+	    if (!res.ok) {
+	        alert("Failed to verify membership");
+	        return false;
+	    }
+
+	    const isMember = await res.json();
+	    
+	    if (!isMember) {
+	        alert("You don't have access to this community");
+	        window.location.href = "communities.html"; // redirect back
+	        return false;
+	    }
+
+	    return true;
+	}
+
+	
+	
+const params = new URLSearchParams(window.location.search);
+const communityId = params.get("id");
+
+const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+if (!currentUser) {
+	alert("Login first");
+	location.href = "login.html";
+}
+
+// Load posts
+async function loadPosts() {
+	const res = await fetch(
+		`http://localhost:8080/api/community-posts/${communityId}`
+	);
+	const posts = await res.json();
+
+	const container = document.getElementById("posts");
+	container.innerHTML = "";
+
+	posts.forEach(p => {
+		const div = document.createElement("div");
+		div.className = "post-card";
+		div.innerHTML = `
+			<p><strong>User ${p.userId}</strong></p>
+			<p>${p.content}</p>
+		`;
+		container.appendChild(div);
+	});
+}
+
+// Create post
+async function createPost() {
+	const content = document.getElementById("content").value.trim();
+	if (!content) return alert("Write something");
+
+	const res = await fetch(
+		"http://localhost:8080/api/community-posts/create",
+		{
+			method: "POST",
+			headers: {"Content-Type": "application/json"},
+			body: JSON.stringify({
+				communityId: communityId,
+				userId: currentUser.id,
+				content: content
+			})
+		}
+	);
+
+	if (res.ok) {
+		document.getElementById("content").value = "";
+		loadPosts();
+	} else {
+		alert("Only members can post");
+	}
+}
+
+(async function init() {
+    const allowed = await checkMembership();
+    if (allowed) {
+        loadPosts();
+    }
+})();
+
+</script>
+
+</body>
+</html>
