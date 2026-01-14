@@ -31,21 +31,19 @@ public class CommunityPostController {
 		return postRepo.findByCommunityId(communityId);
 	}
 
-	
 	@PostMapping("/create")
 	public CommunityPost create(@RequestBody CommunityPost post) {
 
-	    boolean isMember = memberRepo.existsByCommunityIdAndUserId(
-	            post.getCommunityId(),
-	            post.getUserId()
-	    );
+		Long communityId = post.getCommunityId();
+		Long userId = post.getUserId();
 
-	    if (!isMember) {
-	        throw new RuntimeException("You are not a member of this community");
-	    }
+		boolean isMember = memberRepo.existsByCommunityIdAndUserId(communityId, userId);
 
-	    return postRepo.save(post);
+		if (!isMember) {
+			throw new RuntimeException("Only members can post");
+		}
+
+		return postRepo.save(post);
 	}
-
 
 }

@@ -10,5 +10,8 @@ public interface CommunityPostRepository extends JpaRepository<CommunityPost, Lo
 	
 
     List<CommunityPost> findByCommunityId(Long communityId);
+    
+    void deleteByCommunityId(Long communityId);
+
 
 }

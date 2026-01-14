@@ -4,16 +4,18 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+import com.example.cryptoconnect.CryptoconnectApplication;
 import com.example.cryptoconnect.entity.Community;
 import com.example.cryptoconnect.entity.CommunityMember;
 import com.example.cryptoconnect.repository.CommunityMemberRepository;
+import com.example.cryptoconnect.repository.CommunityPostRepository;
 import com.example.cryptoconnect.repository.CommunityRepository;
 import com.example.cryptoconnect.service.CommunityService;
 
@@ -21,6 +23,8 @@ import com.example.cryptoconnect.service.CommunityService;
 @RequestMapping("/api/community")
 @CrossOrigin("*")
 public class CommunityController {
+
+    private final CryptoconnectApplication cryptoconnectApplication;
 
     @Autowired
     private CommunityRepository communityRepo;
@@ -30,6 +34,14 @@ public class CommunityController {
 
     @Autowired
     private CommunityMemberRepository memberRepo;
+    
+    @Autowired
+    private CommunityPostRepository postRepo;
+
+
+    CommunityController(CryptoconnectApplication cryptoconnectApplication) {
+        this.cryptoconnectApplication = cryptoconnectApplication;
+    }
 
     
     @PostMapping("/create")
@@ -40,8 +52,9 @@ public class CommunityController {
     	CommunityMember member = new CommunityMember();
     	member.setCommunityId(saved.getId());
     	member.setUserId(community.getAdminId());
+    	communityMemberRepository.save(member);
     	
-    	memberRepo.save(member);
+    	
     	return saved;
     }
 
@@ -74,6 +87,29 @@ public class CommunityController {
     public boolean isMember(@PathVariable Long communityId, @PathVariable Long userId) {
         return memberRepo.existsByCommunityIdAndUserId(communityId, userId); 
     }
+    
+    @DeleteMapping("/leave/{communityId}/{userId}")
+    public void leaveCommunity(@PathVariable Long communityId,
+                               @PathVariable Long userId) {
+        memberRepo.deleteByCommunityIdAndUserId(communityId, userId);
+    }
 
+    @DeleteMapping("/delete/{communityId}/{adminId}")
+    public void deleteCommunity(@PathVariable Long communityId,
+                                @PathVariable Long adminId) {
 
+        Community community = communityRepo.findById(communityId)
+            .orElseThrow(() -> new RuntimeException("Community not found"));
+
+        if (!community.getAdminId().equals(adminId)) {
+            throw new RuntimeException("Only admin can delete community");
+        }
+
+        memberRepo.deleteByCommunityId(communityId); // FIX
+        postRepo.deleteByCommunityId(communityId);   // FIX
+        communityRepo.deleteById(communityId);
+    }
 }
+
+
+

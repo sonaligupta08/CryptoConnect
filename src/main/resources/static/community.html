@@ -52,6 +52,9 @@ body {
 
 		<h4 id="community-name"></h4>
 
+		<!-- action buttons -->
+		<div id="community-actions" class="mb-3"></div>
+
 		<!-- Post box -->
 		<div class="post-box border p-3 rounded mb-4">
 			<textarea id="content" rows="2"
@@ -65,28 +68,6 @@ body {
 	</div>
 
 	<script>
-	
-	async function checkMembership() {
-	    const res = await fetch(`http://localhost:8080/api/community/is-member/${communityId}/${currentUser.id}`);
-	    
-	    if (!res.ok) {
-	        alert("Failed to verify membership");
-	        return false;
-	    }
-
-	    const isMember = await res.json();
-	    
-	    if (!isMember) {
-	        alert("You don't have access to this community");
-	        window.location.href = "communities.html"; // redirect back
-	        return false;
-	    }
-
-	    return true;
-	}
-
-	
-	
 const params = new URLSearchParams(window.location.search);
 const communityId = params.get("id");
 
@@ -96,7 +77,59 @@ if (!currentUser) {
 	location.href = "login.html";
 }
 
-// Load posts
+let adminId = null;
+
+async function checkMembership() {
+	const res = await fetch(
+		`http://localhost:8080/api/community/is-member/${communityId}/${currentUser.id}`
+	);
+
+	if (!res.ok) {
+		alert("Failed to verify membership");
+		return false;
+	}
+
+	const isMember = await res.json();
+
+	if (!isMember) {
+		alert("You don't have access to this community");
+		window.location.href = "communities.html";
+		return false;
+	}
+	return true;
+}
+
+async function loadCommunityDetails() {
+	const res = await fetch(
+		`http://localhost:8080/api/community/${communityId}`
+	);
+	const community = await res.json();
+
+	document.getElementById("community-name").innerText = community.name;
+	adminId = Number(community.adminId);
+
+	renderCommunityActions();
+}
+
+function renderCommunityActions() {
+	const div = document.getElementById("community-actions");
+	div.innerHTML = "";
+
+	if (Number(currentUser.id) === Number(adminId)) {
+		div.innerHTML = `
+			<button class="btn btn-danger" onclick="deleteCommunity()">
+				Delete Community
+			</button>
+		`;
+	} else {
+		div.innerHTML = `
+			<button class="btn btn-warning" onclick="leaveCommunity()">
+				Leave Community
+			</button>
+		`;
+	}
+}
+
 async function loadPosts() {
 	const res = await fetch(
 		`http://localhost:8080/api/community-posts/${communityId}`
@@ -117,7 +150,6 @@ async function loadPosts() {
 	});
 }
 
-// Create post
 async function createPost() {
 	const content = document.getElementById("content").value.trim();
 	if (!content) return alert("Write something");
@@ -143,13 +175,35 @@ async function createPost() {
 	}
 }
 
-(async function init() {
-    const allowed = await checkMembership();
-    if (allowed) {
-        loadPosts();
-    }
-})();
+async function leaveCommunity() {
+	if (!confirm("Leave this community?")) return;
 
+	await fetch(
+		`http://localhost:8080/api/community/leave/${communityId}/${currentUser.id}`,
+		{ method: "DELETE" }
+	);
+
+	window.location.href = "communities.html";
+}
+
+async function deleteCommunity() {
+	if (!confirm("Delete this community permanently?")) return;
+
+	await fetch(
+		`http://localhost:8080/api/community/delete/${communityId}/${currentUser.id}`,
+		{ method: "DELETE" }
+	);
+
+	window.location.href = "communities.html";
+}
+
+(async function init() {
+	const allowed = await checkMembership();
+	if (allowed) {
+		await loadCommunityDetails();
+		loadPosts();
+	}
+})();
 </script>
 
 </body>

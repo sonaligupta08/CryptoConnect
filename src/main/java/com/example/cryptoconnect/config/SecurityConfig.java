@@ -65,7 +65,8 @@ public class SecurityConfig {
                         "/dashboard.html",
                         "/profile.html",
                         "/about.html",
-                        "/communities.html"
+                        "/communities.html",
+                        "/community.html"
                 ).permitAll()
 
                 .requestMatchers(
