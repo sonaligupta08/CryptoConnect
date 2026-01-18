@@ -2,258 +2,264 @@
 <html lang="en">
 
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-	<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-	<script src="https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@3.1.1/dist/index.min.js"></script>
-
-	<title>Dashboard</title>
-
-	<style>
-		body {
-			margin: 0;
-			font-family: "Poppins", sans-serif;
-			background-color: #000 !important;
-			color: #fff;
-		}
-
-		.outer {
-			display: flex;
-			height: 100vh;
-
-		}
-
-		.sidebar {
-			color: #fff !important;
-			background-color: #000;
-			width: 260px;
-			display: flex;
-			flex-direction: column;
-			justify-content: space-around;
-			padding: 2rem 1.5rem;
-			border: 1px solid #2f3336;
-			height: 100vh;
-
-		}
-
-		.brand {
-			color: #fff;
-			text-align: left;
-			margin-bottom: 2rem;
-		}
-
-		.sidebar ul {
-			list-style: none;
-			padding: 0;
-		}
-
-		.sidebar ul li {
-			display: flex;
-			align-items: center;
-			gap: 15px;
-			padding: 10px 0;
-			font-size: 1.2rem;
-			cursor: pointer;
-			transition: 0.3s;
-		}
-
-		.sidebar ul li:hover {
-			background-color: #16181c;
-			border-radius: 25px;
-			padding-left: 12px;
-			color: #1d9bf0;
-		}
-
-		.profile-section {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			background-color: #000;
-			border-radius: 50px;
-			padding: 10px;
-			margin-top: 20px;
-		}
-
-		.profile-pic {
-			background-color: #1d9bf0;
-			color: #fff;
-			width: 38px;
-			height: 38px;
-			border-radius: 50%;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			font-weight: bold;
-		}
-
-		.username {
-			margin: 0;
-			font-weight: 600;
-		}
-
-		.handle {
-			margin: 0;
-			color: #71767b;
-			font-size: 0.9rem;
-		}
-
-		.content {
-			flex-grow: 1;
-			background-color: #000;
-			padding: 2rem;
-			border-left: 1px solid #2f3336;
-			border-right: 1px solid #2f3336;
-
-		}
-
-		.coin-img {
-			border-radius: 50%;
-			height: 40px;
-			width: 60px;
-			object-fit: cover;
-			box-shadow: 0 0 50px rgba(63, 121, 227, 0.9);
-		}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+	rel="stylesheet">
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+	rel="stylesheet">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script
+	src="https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@3.1.1/dist/index.min.js"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 
 
-		.for-you {
-			border: 1px solid #2f3336;
-			border-left: none;
-			width: 100%;
-		}
+<title>Dashboard</title>
 
-		.content-2 {
-			flex-grow: 0.5;
-			border: 1px solid #2f3336;
-			background-color: #000;
-		}
+<style>
+body {
+	margin: 0;
+	font-family: "Poppins", sans-serif;
+	background-color: #000 !important;
+	color: #fff;
+}
 
-		#input {
-			background-color: rgba(0, 0, 0, 0.2);
-			padding: 10px;
-			width: 100%;
-			color: #fff;
-			font-size: 1.1rem;
-			outline: none;
-		}
+.outer {
+	display: flex;
+	height: 100vh;
+}
 
-		.emojis {
-			color: #1d9bf0;
-			font-size: 20px;
-		}
+.sidebar {
+	color: #fff !important;
+	background-color: #000;
+	width: 260px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	padding: 2rem 1.5rem;
+	border: 1px solid #2f3336;
+	height: 100vh;
+}
 
-		.divide {
-			border-bottom: 1px solid #2f3336;
-			padding: 1 rem 0;
-		}
+.brand {
+	color: #fff;
+	text-align: left;
+	margin-bottom: 2rem;
+}
 
-		.divide .profile-section {
-			display: flex;
-			align-items: center;
-			gap: 15px;
-			background-color: transparent;
-			border-radius: 0;
-			padding: 0;
-			margin: 0;
-		}
+.sidebar ul {
+	list-style: none;
+	padding: 0;
+}
 
-		.emojis {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			padding: 0.5rem 0;
-			color: #1d9bf0;
-			font-size: 20px;
-		}
+.sidebar ul li {
+	display: flex;
+	align-items: center;
+	gap: 15px;
+	padding: 10px 0;
+	font-size: 1.2rem;
+	cursor: pointer;
+	transition: 0.3s;
+}
 
-		.post {
-			background-color: #fff;
-			color: #000;
-			border: none;
-			border-radius: 50px;
-			font-weight: bold;
-			font-size: 1rem;
-			padding: 12px 0;
-			margin-top: 10px;
-			cursor: pointer;
-			width: 15%;
-			transition: 0.3s;
-		}
+.sidebar ul li:hover {
+	background-color: #16181c;
+	border-radius: 25px;
+	padding-left: 12px;
+	color: #1d9bf0;
+}
 
-		.search {
-			padding: 12px 0;
-			background-color: #000;
-			color: white;
-		}
+.profile-section {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	background-color: #000;
+	border-radius: 50px;
+	padding: 10px;
+	margin-top: 20px;
+}
 
-		.connect-img img {
-			margin-left: 1px;
-			width: 100%;
-			height: 300px;
-			object-fit: cover;
-			border-radius: 0;
-		}
+.profile-pic {
+	background-color: #1d9bf0;
+	color: #fff;
+	width: 38px;
+	height: 38px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: bold;
+}
 
-		#input {
-			width: 100%;
-			border: none;
-			outline: none;
-			resize: none;
-			background: transparent;
-			color: white;
-			font-size: 1rem;
-			overflow-wrap: break-word;
-		}
+.username {
+	margin: 0;
+	font-weight: 600;
+}
 
-		.post-card {
-			padding: 1rem;
-			border-bottom: 1px solid #2f3336;
-			color: white;
-		}
+.handle {
+	margin: 0;
+	color: #71767b;
+	font-size: 0.9rem;
+}
 
-		.post-text {
-			font-size: 1rem;
-			margin-top: 10px;
-			white-space: pre-wrap;
-		}
+.content {
+	flex-grow: 1;
+	background-color: #000;
+	padding: 2rem;
+	border-left: 1px solid #2f3336;
+	border-right: 1px solid #2f3336;
+}
 
-		.action-buttons {
-			display: flex;
-			align-items: center;
-			gap: 2rem;
-			padding: 0.5rem 0;
-		}
+.coin-img {
+	border-radius: 50%;
+	height: 40px;
+	width: 60px;
+	object-fit: cover;
+	box-shadow: 0 0 50px rgba(63, 121, 227, 0.9);
+}
 
-		.action-buttons button {
-			background: transparent;
-			color: white;
-			border: none;
-			font-size: 1.4rem;
-			cursor: pointer;
-			padding: 5px;
-			border-radius: 50%;
-			transition: 0.2s;
-		}
+.for-you {
+	border: 1px solid #2f3336;
+	border-left: none;
+	width: 100%;
+}
 
-		.action-buttons button:hover {
-			color: #1d9bf0;
-			background-color: rgba(29, 155, 240, 0.15);
-		}
+.content-2 {
+	flex-grow: 0.5;
+	border: 1px solid #2f3336;
+	background-color: #000;
+}
 
-		.posted-img {
-			height: 200px;
-			width: 200px;
-		}
+#input {
+	background-color: rgba(0, 0, 0, 0.2);
+	padding: 10px;
+	width: 100%;
+	color: #fff;
+	font-size: 1.1rem;
+	outline: none;
+}
 
-		#image-preview img {
-			width: 200px;
-			height: auto;
-			border-radius: 12px;
-			margin-top: 10px;
-			border: 1px solid #2f3336;
-		}
-	</style>
+.emojis {
+	color: #1d9bf0;
+	font-size: 20px;
+}
+
+.divide {
+	border-bottom: 1px solid #2f3336;
+	padding: 1 rem 0;
+}
+
+.divide .profile-section {
+	display: flex;
+	align-items: center;
+	gap: 15px;
+	background-color: transparent;
+	border-radius: 0;
+	padding: 0;
+	margin: 0;
+}
+
+.emojis {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.5rem 0;
+	color: #1d9bf0;
+	font-size: 20px;
+}
+
+.post {
+	background-color: #fff;
+	color: #000;
+	border: none;
+	border-radius: 50px;
+	font-weight: bold;
+	font-size: 1rem;
+	padding: 12px 0;
+	margin-top: 10px;
+	cursor: pointer;
+	width: 15%;
+	transition: 0.3s;
+}
+
+.search {
+	padding: 12px 0;
+	background-color: #000;
+	color: white;
+}
+
+.connect-img img {
+	margin-left: 1px;
+	width: 100%;
+	height: 300px;
+	object-fit: cover;
+	border-radius: 0;
+}
+
+#input {
+	width: 100%;
+	border: none;
+	outline: none;
+	resize: none;
+	background: transparent;
+	color: white;
+	font-size: 1rem;
+	overflow-wrap: break-word;
+}
+
+.post-card {
+	padding: 1rem;
+	border-bottom: 1px solid #2f3336;
+	color: white;
+}
+
+.post-text {
+	font-size: 1rem;
+	margin-top: 10px;
+	white-space: pre-wrap;
+}
+
+.action-buttons {
+	display: flex;
+	align-items: center;
+	gap: 2rem;
+	padding: 0.5rem 0;
+}
+
+.action-buttons button {
+	background: transparent;
+	color: white;
+	border: none;
+	font-size: 1.4rem;
+	cursor: pointer;
+	padding: 5px;
+	border-radius: 50%;
+	transition: 0.2s;
+}
+
+.action-buttons button:hover {
+	color: #1d9bf0;
+	background-color: rgba(29, 155, 240, 0.15);
+}
+
+.posted-img {
+	height: 200px;
+	width: 200px;
+}
+
+#image-preview img {
+	width: 200px;
+	height: auto;
+	border-radius: 12px;
+	margin-top: 10px;
+	border: 1px solid #2f3336;
+}
+</style>
 </head>
 
 <body>
@@ -262,19 +268,21 @@
 
 			<!-- Sidebar -->
 			<div class="col-md-3 sidebar d-none d-md-flex flex-column">
-				<h2 class="brand"><img src="bitcoin.png.png" alt="bitcoin" class="coin-img"></h2>
+				<h2 class="brand">
+					<img src="bitcoin.png.png" alt="bitcoin" class="coin-img">
+				</h2>
 
 				<div class="menu">
 					<ul>
 						<li><i class='bx bx-home'></i> Home</li>
 						<li><i class='bx bx-bell'></i> Notification</li>
-						<li><i class='bx bx-message'></i> Messages</li>
-						
-						<li onclick="openCommunities()">
-							<i class='bx bx-group'></i> Communities
-						</li>
-						
-						<li onclick="window.location.href='profile.html'"><i class='bx bx-user'></i> Profile</li>
+						<li onclick="window.location.href='message.html'"><i class='bx bx-message'></i> Messages</li>
+
+						<li onclick="openCommunities()"><i class='bx bx-group'></i>
+							Communities</li>
+
+						<li onclick="window.location.href='profile.html'"><i
+							class='bx bx-user'></i> Profile</li>
 					</ul>
 				</div>
 
@@ -299,16 +307,15 @@
 
 						<textarea placeholder="What's happening?" id="input" rows="2"></textarea>
 
-						<input type="file" id="imageUpload" accept="image/*" style="display:none;">
+						<input type="file" id="imageUpload" accept="image/*"
+							style="display: none;">
 						<div id="image-preview"></div>
 					</div>
 
 					<div class="emojis">
-						<a onclick="document.getElementById('imageUpload').click()">
-							<i class="fa-regular fa-image"></i>
-						</a>
-
-						<a><i class='bx bx-smile'></i></a>
+						<a onclick="document.getElementById('imageUpload').click()"> <i
+							class="fa-regular fa-image"></i>
+						</a> <a><i class='bx bx-smile'></i></a>
 
 						<button class="post" type="button">Post</button>
 					</div>
@@ -332,10 +339,10 @@
 	<!-- Mobile Bottom Nav -->
 	<nav class="navbar navbar-dark bg-dark d-md-none fixed-bottom">
 		<div class="container justify-content-around">
-			<a href="#" class="text-light"><i class='bx bx-home'></i></a>
-			<a href="#" class="text-light"><i class='bx bx-search'></i></a>
-			<a href="#" class="text-light"><i class='bx bx-bell'></i></a>
-			<a href="#" class="text-light"><i class='bx bx-user'></i></a>
+			<a href="#" class="text-light"><i class='bx bx-home'></i></a> <a
+				href="#" class="text-light"><i class='bx bx-search'></i></a> <a
+				href="#" class="text-light"><i class='bx bx-bell'></i></a> <a
+				href="#" class="text-light"><i class='bx bx-user'></i></a>
 		</div>
 	</nav>
 
@@ -482,6 +489,28 @@
 		function openCommunities() {
 			window.location.href = "communities.html";
 		}
+
+		let stompClient = null;
+		
+
+		function connectSocket() {
+		    const socket = new SockJS("http://localhost:8080/ws");
+		    stompClient = Stomp.over(socket);
+
+		    stompClient.connect({}, () => {
+
+		    	// NOTIFICATIONS
+		    	stompClient.subscribe("/topic/notifications", (msg) => {
+		    	    const data = JSON.parse(msg.body);
+		    	    console.log("Notification:", data);
+		    	    alert(`Notification: ${data.content}`);
+		    	});
+
+
+		    });
+		}
+
+		connectSocket();
 
 	</script>
 

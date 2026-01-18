@@ -10,7 +10,7 @@ public class Community {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long Id;
+	private Long id;
 	private String name;
 	private Long adminId;
 	private String description;
@@ -24,11 +24,11 @@ public class Community {
 	}
 
 	public Long getId() {
-		return Id;
+		return id;
 	}
 
 	public void setId(Long id) {
-		Id = id;
+		this.id = id;
 	}
 
 	public String getName() {

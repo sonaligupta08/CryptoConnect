@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Messages</title>
+
+
+<style>
+body.dark {
+	background-color: #0d0d0d;
+	color: #ffffff;
+	font-family: Arial, sans-serif;
+}
+
+.chat-container {
+	width: 400px;
+	margin: 50px auto;
+	background: #1a1a1a;
+	border-radius: 10px;
+	padding: 15px;
+}
+
+.chat-header {
+	text-align: center;
+	border-bottom: 1px solid #333;
+	padding-bottom: 10px;
+}
+
+#message-box {
+	height: 300px;
+	overflow-y: auto;
+	margin: 15px 0;
+}
+
+.chat-input {
+	display: flex;
+}
+
+.chat-input input {
+	flex: 1;
+	padding: 10px;
+	background: #2a2a2a;
+	border: none;
+	color: white;
+}
+
+.chat-input button {
+	padding: 10px 15px;
+	background: #00bcd4;
+	border: none;
+	cursor: pointer;
+}
+</style>
+</head>
+<body class="dark">
+
+	<div class="chat-container">
+		<div class="chat-header">
+			<h3>CryptoConnect Chat</h3>
+		</div>
+
+		<div id="message-box">
+			<!-- messages will appear here -->
+		</div>
+
+		<div class="chat-input">
+			<input type="text" id="messageInput" placeholder="Type a message..." />
+			<button onclick="sendMessage()">Send</button>
+		</div>
+	</div>
+
+	<script>
+		function sendMessage() {
+			const input = document.getElementById("messageInput");
+			const messageBox = document.getElementById("message-box");
+
+			if (input.value.trim() === "")
+				return;
+
+			const msg = document.createElement("div");
+			msg.textContent = input.value;
+			msg.style.padding = "8px";
+			msg.style.margin = "5px 0";
+			msg.style.background = "#333";
+			msg.style.borderRadius = "5px";
+
+			messageBox.appendChild(msg);
+			messageBox.appendChild(msg);
+			input.value = "";
+		}
+	</script>
+</body>
+</html>

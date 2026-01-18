@@ -24,92 +24,91 @@ import com.example.cryptoconnect.service.CommunityService;
 @CrossOrigin("*")
 public class CommunityController {
 
-    private final CryptoconnectApplication cryptoconnectApplication;
+	private final CryptoconnectApplication cryptoconnectApplication;
 
-    @Autowired
-    private CommunityRepository communityRepo;
+	@Autowired
+	private CommunityRepository communityRepo;
 
-    @Autowired
-    private CommunityService communityService;
+	@Autowired
+	private CommunityService communityService;
 
-    @Autowired
-    private CommunityMemberRepository memberRepo;
-    
-    @Autowired
-    private CommunityPostRepository postRepo;
+	@Autowired
+	private CommunityMemberRepository memberRepo;
 
+	@Autowired
+	private CommunityPostRepository postRepo;
 
-    CommunityController(CryptoconnectApplication cryptoconnectApplication) {
-        this.cryptoconnectApplication = cryptoconnectApplication;
-    }
+	CommunityController(CryptoconnectApplication cryptoconnectApplication) {
+		this.cryptoconnectApplication = cryptoconnectApplication;
+	}
 
-    
-    @PostMapping("/create")
-    public Community create(@RequestBody Community community) {
-       
-    	Community saved = communityRepo.save(community);
-    	
-    	CommunityMember member = new CommunityMember();
-    	member.setCommunityId(saved.getId());
-    	member.setUserId(community.getAdminId());
-    	communityMemberRepository.save(member);
-    	
-    	
-    	return saved;
-    }
+	@PostMapping("/create")
+	public Community create(@RequestBody Community community) {
 
-  
-    @PostMapping("/add-member/{communityId}/{userId}")
-    public void addMember(@PathVariable Long communityId,
-                          @PathVariable Long userId) {
-        communityService.addMember(communityId, userId);
-    }
+		Community saved = communityRepo.save(community);
 
+		CommunityMember member = new CommunityMember();
+		member.setCommunityId(saved.getId());
+		member.setUserId(community.getAdminId());
+		member.setRole("ADMIN");
+		memberRepo.save(member);
+		return saved;
+	}
 
-    @GetMapping("/user/{userId}")
-    public List<CommunityMember> userCommunities(@PathVariable Long userId) {
-        return memberRepo.findByUserId(userId);
-    }
-    
-    @GetMapping("/all")
-    public List<Community> getAll() {
-        return communityRepo.findAll();
-    }
-    
- 
-    @GetMapping("/member-count/{communityId}")
-    public int getMemberCount(@PathVariable Long communityId) {
-        return memberRepo.countByCommunityId(communityId); 
-    }
+	@GetMapping("/{communityId}")
+	public Community getCommunity(@PathVariable Long communityId) {
+		return communityRepo.findById(communityId).orElseThrow(() -> new RuntimeException("Community not found"));
+	}
 
-    
-    @GetMapping("/is-member/{communityId}/{userId}")
-    public boolean isMember(@PathVariable Long communityId, @PathVariable Long userId) {
-        return memberRepo.existsByCommunityIdAndUserId(communityId, userId); 
-    }
-    
-    @DeleteMapping("/leave/{communityId}/{userId}")
-    public void leaveCommunity(@PathVariable Long communityId,
-                               @PathVariable Long userId) {
-        memberRepo.deleteByCommunityIdAndUserId(communityId, userId);
-    }
+	@PostMapping("/add-member/{communityId}/{userId}")
+	public void addMember(@PathVariable Long communityId, @PathVariable Long userId) {
+		communityService.addMember(communityId, userId);
+	}
 
-    @DeleteMapping("/delete/{communityId}/{adminId}")
-    public void deleteCommunity(@PathVariable Long communityId,
-                                @PathVariable Long adminId) {
+	@GetMapping("/user/{userId}")
+	public List<CommunityMember> userCommunities(@PathVariable Long userId) {
+		return memberRepo.findByUserId(userId);
+	}
 
-        Community community = communityRepo.findById(communityId)
-            .orElseThrow(() -> new RuntimeException("Community not found"));
+	@GetMapping("/all")
+	public List<Community> getAll() {
+		return communityRepo.findAll();
+	}
 
-        if (!community.getAdminId().equals(adminId)) {
-            throw new RuntimeException("Only admin can delete community");
-        }
+	@GetMapping("/member-count/{communityId}")
+	public int getMemberCount(@PathVariable Long communityId) {
+		return memberRepo.countByCommunityId(communityId);
+	}
 
-        memberRepo.deleteByCommunityId(communityId); // FIX
-        postRepo.deleteByCommunityId(communityId);   // FIX
-        communityRepo.deleteById(communityId);
-    }
+	@GetMapping("/is-member/{communityId}/{userId}")
+	public boolean isMember(@PathVariable Long communityId, @PathVariable Long userId) {
+		return memberRepo.existsByCommunityIdAndUserId(communityId, userId);
+	}
+
+	@DeleteMapping("/leave/{communityId}/{userId}")
+	public void leaveCommunity(@PathVariable Long communityId, @PathVariable Long userId) {
+		memberRepo.deleteByCommunityIdAndUserId(communityId, userId);
+	}
+
+	@DeleteMapping("/delete/{communityId}/{adminId}")
+	public void deleteCommunity(@PathVariable Long communityId, @PathVariable Long adminId) {
+
+		Community community = communityRepo.findById(communityId)
+				.orElseThrow(() -> new RuntimeException("Community not found"));
+
+		if (!community.getAdminId().equals(adminId)) {
+			throw new RuntimeException("Only admin can delete community");
+		}
+
+		memberRepo.deleteByCommunityId(communityId); // FIX
+		postRepo.deleteByCommunityId(communityId); // FIX
+		communityRepo.deleteById(communityId);
+	}
+
+	@GetMapping("/role/{communityId}/{userId}")
+	public String getUserRole(@PathVariable Long communityId, @PathVariable Long userId) {
+
+		return communityService.getUserRole(communityId, userId);
+	}
+
 }
-
-
-

@@ -1,6 +1,7 @@
 package com.example.cryptoconnect.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -17,6 +18,10 @@ public interface CommunityMemberRepository extends JpaRepository<CommunityMember
 	 void deleteByCommunityIdAndUserId(Long communityId, Long userId);
 	 
 	 void deleteByCommunityId(Long communityId);
+	 
+	 Optional<CommunityMember> 
+	 findByCommunityIdAndUserId(Long communityId, Long userId);
+
 
 
 }

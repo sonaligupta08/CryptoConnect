@@ -77,7 +77,7 @@ if (!currentUser) {
 	location.href = "login.html";
 }
 
-let adminId = null;
+
 
 async function checkMembership() {
 	const res = await fetch(
@@ -106,16 +106,19 @@ async function loadCommunityDetails() {
 	const community = await res.json();
 
 	document.getElementById("community-name").innerText = community.name;
-	adminId = Number(community.adminId);
-
-	renderCommunityActions();
+	
 }
 
-function renderCommunityActions() {
+async function renderCommunityActions() {
 	const div = document.getElementById("community-actions");
 	div.innerHTML = "";
 
-	if (Number(currentUser.id) === Number(adminId)) {
+	const res = await fetch(
+		`http://localhost:8080/api/community/role/${communityId}/${currentUser.id}`
+	);
+	const role = await res.text();
+
+	if (role === "ADMIN") {
 		div.innerHTML = `
 			<button class="btn btn-danger" onclick="deleteCommunity()">
 				Delete Community
@@ -129,6 +132,7 @@ function renderCommunityActions() {
 		`;
 	}
 }
+
 
 async function loadPosts() {
 	const res = await fetch(
@@ -201,9 +205,11 @@ async function deleteCommunity() {
 	const allowed = await checkMembership();
 	if (allowed) {
 		await loadCommunityDetails();
+		await renderCommunityActions();
 		loadPosts();
 	}
 })();
+
 </script>
 
 </body>

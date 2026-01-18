@@ -16,7 +16,35 @@ public class User {
 	private String username;
 	private String email;
 	private String password;
+	private int age;
+	private String bio;
+	private String profileImage;
 
+	public int getAge() {
+		return age;
+	}
+
+	public void setAge(int age) {
+		this.age = age;
+	}
+
+	public String getBio() {
+		return bio;
+	}
+
+	public void setBio(String bio) {
+		this.bio = bio;
+	}
+
+	public String getProfileImage() {
+		return profileImage;
+	}
+
+	public void setProfileImage(String profileImage) {
+		this.profileImage = profileImage;
+	}
+
+	
 	public String getUsername() {
 		return username;
 	}

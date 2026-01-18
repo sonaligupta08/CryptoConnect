@@ -28,17 +28,32 @@ public class AuthController {
 	private PasswordEncoder encoder;
 
 	@PostMapping("/signup")
-	public Map<String, String> signup(@RequestBody User user) {
-		if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-			return Map.of("message", "Email already exists!");
-		}
-		user.setPassword(encoder.encode(user.getPassword()));
+	public Map<String, Object> signup(@RequestBody User user) {
 
-		userRepository.save(user);
+	    
+	    if (user.getAge() < 18) {
+	        return Map.of("message", "You must be 18 or above to sign up");
+	    }
 
-		return Map.of("message", "Signup successful!");
+	    if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+	        return Map.of("message", "Email already exists!");
+	    }
 
+	    user.setPassword(encoder.encode(user.getPassword()));
+
+	    user.setUsername(null);
+	    user.setBio("");
+	    user.setProfileImage("");
+
+	    User savedUser = userRepository.save(user);
+
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("message", "Signup successful!");
+	    response.put("userId", savedUser.getId());
+
+	    return response;
 	}
+
 
 	@PostMapping("/login")
 	public Map<String, Object> login(@RequestBody User user) {
