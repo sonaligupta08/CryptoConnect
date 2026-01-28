@@ -1,31 +1,37 @@
 package com.example.cryptoconnect.controller;
 
+import java.time.LocalDateTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Controller;
 
-
-import com.example.cryptoconnect.entity.ChatMessage;
+import com.example.cryptoconnect.entity.Message;
+import com.example.cryptoconnect.repository.MessageRepository;
 
 @Controller
 public class ChatController {
-	
-	 @Autowired
-	    private SimpMessagingTemplate messagingTemplate;
-	 
-	  @MessageMapping("/chat.send")
-	    public void sendMessage(ChatMessage message) {
-	        messagingTemplate.convertAndSendToUser(
-	                message.getReceiver(),
-	                "/queue/messages",
-	                message
-	        );
-	    }
-	  
-	  @MessageMapping("/notify")
-	    public void sendNotification(ChatMessage message) {
-	        messagingTemplate.convertAndSend("/topic/notifications", message);
-	    }
 
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+
+    @Autowired
+    private MessageRepository messageRepository;
+
+    @MessageMapping("/chat.send")
+    public void sendMessage(Message message) {
+
+        
+        message.setTimestamp(LocalDateTime.now());
+
+        
+        messageRepository.save(message);
+
+        messagingTemplate.convertAndSendToUser(
+                message.getReceiver(),
+                "/queue/messages",
+                message
+        );
+    }
 }

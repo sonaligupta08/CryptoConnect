@@ -47,8 +47,8 @@ label {
 			</div>
 
 			<div class="mb-3">
-				<label for="profileImage">Profile Image URL</label> <input
-					type="text" id="profileImage" class="form-control"
+				<label for="profileImage">Profile Image</label> <input
+					type="file" id="profileImage" class="form-control"
 					placeholder="Paste image URL">
 			</div>
 
@@ -58,49 +58,63 @@ label {
 	</div>
 
 	<script>
-  const form = document.getElementById("profile-form");
+	const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
+	if (!currentUser) {
+	  alert("Please sign up first");
+	  window.location.href = "signup.html";
+	}
+	
+const form = document.getElementById("profile-form");
 
-    const username = document.getElementById("username").value.trim();
-    const bio = document.getElementById("bio").value.trim();
-    const profileImage = document.getElementById("profileImage").value.trim();
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
 
-    if (!username) {
-      alert("Username is required");
-      return;
-    }
+  const username = document.getElementById("username").value.trim();
+  const bio = document.getElementById("bio").value.trim();
+  const imageFile = document.getElementById("profileImage").files[0];
 
-    const userId = localStorage.getItem("tempUserId");
-    if (!userId) {
-      alert("No user found. Please signup first.");
-      location.href = "signup.html";
-      return;
-    }
+  if (!username) {
+    alert("Username is required");
+    return;
+  }
+  if (!currentUser || !currentUser.id) {
+    alert("Please login first");
+    window.location.href = "login.html";
+    return;
+  }
 
-    try {
-      const res = await fetch(`http://localhost:8080/api/users/profile/${userId}`, {
+  const formData = new FormData();
+  formData.append("username", username);
+  formData.append("bio", bio);
+
+  if (imageFile) {
+    formData.append("profileImage", imageFile);
+  }
+
+  try {
+    const res = await fetch(
+      `http://localhost:8080/api/users/profile/${currentUser.id}`,
+      {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, bio, profileImage })
-      });
+        body: formData   
+      }
+    );
 
-      if (!res.ok) throw new Error("Failed to update profile");
+    if (!res.ok) throw new Error("Failed to update profile");
 
-      const updatedUser = await res.json();
+    const updatedUser = await res.json();
+    localStorage.setItem("currentUser", JSON.stringify(updatedUser));
 
-      
-      localStorage.setItem("currentUser", JSON.stringify(updatedUser));
-
-      alert("Profile saved successfully!");
-      window.location.href = "dashboard.html"; 
-    } catch (error) {
-      console.error(error);
-      alert("Error saving profile. Check console.");
-    }
-  });
+    alert("Profile saved successfully!");
+    window.location.href = "profile.html";
+  } catch (err) {
+    console.error(err);
+    alert("Error saving profile");
+  }
+});
 </script>
+
 
 </body>
 </html>

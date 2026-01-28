@@ -142,6 +142,7 @@ label {
 		const form = document.getElementById("signup-form");
 
 form.addEventListener("submit", async (event) => {
+console.log("Signup button clicked");
   event.preventDefault();
 
   const email = document.getElementById("email").value.trim();
@@ -173,15 +174,30 @@ if (password !== confirmPassword) {
       body: JSON.stringify({ email, password, age })
     });
 
-    const data = await res.json();
+  const text = await res.text();
+console.log("Raw response:", text);
 
-    if (data.message === "Signup successful!") {
-      localStorage.setItem("tempUserId", data.userId);
-      window.location.href = "profile-setup.html";
-    } else {
-      alert(data.message);
-    }
+let data;
+try {
+  data = JSON.parse(text);
+} catch (e) {
+  alert("Backend did not return JSON");
+  return;
+}
 
+   if (res.ok) {
+
+  const user = {
+    id: data.userId,
+    email: email,
+    username: null,
+    bio: "",
+    profileImage: ""
+  };
+
+  localStorage.setItem("currentUser", JSON.stringify(user));
+  window.location.href = "profilesetup.html";
+}
   } catch (error) {
     console.error("Signup error:", error);
     alert("Signup failed! Check console for details.");

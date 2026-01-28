@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.cryptoconnect.entity.Post;
 import com.example.cryptoconnect.repository.PostRepository;
+import com.example.cryptoconnect.service.BlockchainService;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -23,10 +24,14 @@ public class PostController {
 
 	@Autowired
 	private PostRepository postRepository;
+	
+	@Autowired
+	private BlockchainService blockchainService;
 
 //creating post
 	@PostMapping("/create")
 	public Post createPost(@RequestBody Post post) {
+		blockchainService.savePostHashToBlockchain(post.getPostHash());
 		return postRepository.save(post);
 	}
 

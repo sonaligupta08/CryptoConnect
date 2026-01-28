@@ -2,6 +2,7 @@ package com.example.cryptoconnect.entity;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,8 +19,27 @@ public class Post {
 	private Long userId;  //owner id
 	private String username; //owner name
 	private String content;
-	@Lob
+	@Column(columnDefinition = "LONGTEXT")
 	private String imageUrl;
+	private String postHash;
+	private String walletAddress;
+	
+	public String getPostHash() {
+		return postHash;
+	}
+
+	public void setPostHash(String postHash) {
+		this.postHash = postHash;
+	}
+
+	public String getWalletAddress() {
+		return walletAddress;
+	}
+
+	public void setWalletAddress(String walletAddress) {
+		this.walletAddress = walletAddress;
+	}
+
 	private LocalDateTime createdAt = LocalDateTime.now();
 
 	public Long getId() {

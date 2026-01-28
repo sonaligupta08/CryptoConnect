@@ -16,49 +16,53 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 public class SecurityConfig {
 
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowedOrigins(List.of(
-                "http://localhost:5500",
-                "http://127.0.0.1:5500"
-        ));
+        	    "http://localhost:5500",
+        	    "http://localhost:8080"
+        	));
+
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
     }
 
+   
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
+            
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
-
+                
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
+              
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/users/**").permitAll()
                 .requestMatchers("/api/posts/**").permitAll()
                 .requestMatchers("/api/likes/**").permitAll()
-                .requestMatchers("/api/community/**").permitAll() 
-                .requestMatchers("/api/community/member-count/**").permitAll()
-                .requestMatchers("/api/community/is-member/**").permitAll()
-                .requestMatchers("/ws/**").permitAll()
+                .requestMatchers("/api/community/**").permitAll()
+                .requestMatchers("/api/community-posts/**").permitAll()
+                .requestMatchers("/uploads/**").permitAll()
 
-
-
+                
                 .requestMatchers(
                         "/",
                         "/index.html",
@@ -68,19 +72,22 @@ public class SecurityConfig {
                         "/profile.html",
                         "/about.html",
                         "/communities.html",
-                        "/community.html"
+                        "/community.html",
+                        "/message.html",
+                        "/profilesetup.html"
                 ).permitAll()
 
+              
                 .requestMatchers(
-                        "/**/*.css",
-                        "/**/*.js",
-                        "/**/*.png",
-                        "/**/*.jpg",
-                        "/**/*.jpeg",
+                        "/*.png",
+                        "/*.jpg",
+                        "/*.jpeg",
+                        "/*.svg",
                         "/favicon.ico"
                 ).permitAll()
 
-                .anyRequest().authenticated()
+                
+                .requestMatchers("/api/chat/**").permitAll()
             );
 
         return http.build();

@@ -174,19 +174,19 @@ body {
 	
 	async function loadCommunityCard(community, container) {
 	    try {
-	        const countRes = await fetch(`http://localhost:8080/api/community/member-count/${community.Id}`);
+	        const countRes = await fetch(`http://localhost:8080/api/community/member-count/${community.id}`);
 	        const count = countRes.ok ? await countRes.text() : 0;
 
-	        const memberRes = await fetch(`http://localhost:8080/api/community/is-member/${community.Id}/${currentUser.id}`);
+	        const memberRes = await fetch(`http://localhost:8080/api/community/is-member/${community.id}/${currentUser.id}`);
 	        const isMember = memberRes.ok ? await memberRes.json() : false;
 
 	        let buttonHTML = "";
 	        if (isMember) {
-	            buttonHTML = `<button class="btn btn-sm btn-outline-primary" onclick="openCommunity(${community.Id})">Open</button>`;
+	            buttonHTML = `<button class="btn btn-sm btn-outline-primary" onclick="openCommunity(${community.id})">Open</button>`;
 	        } else if (count >= 5) {
 	            buttonHTML = `<button class="btn btn-sm btn-secondary" disabled>Full</button>`;
 	        } else {
-	            buttonHTML = `<button class="btn btn-sm btn-primary" onclick="joinCommunity(${community.Id})">Join</button>`;
+	            buttonHTML = `<button class="btn btn-sm btn-primary" onclick="joinCommunity(${community.id})">Join</button>`;
 	        }
 
 	        const div = document.createElement("div");

@@ -135,24 +135,31 @@ async function renderCommunityActions() {
 
 
 async function loadPosts() {
-	const res = await fetch(
-		`http://localhost:8080/api/community-posts/${communityId}`
-	);
-	const posts = await res.json();
+    const res = await fetch(
+        `http://localhost:8080/api/community-posts/${communityId}`
+    );
 
-	const container = document.getElementById("posts");
-	container.innerHTML = "";
+    if (!res.ok) {
+        console.error("Failed to load posts", res.status);
+        return;
+    }
 
-	posts.forEach(p => {
-		const div = document.createElement("div");
-		div.className = "post-card";
-		div.innerHTML = `
-			<p><strong>User ${p.userId}</strong></p>
-			<p>${p.content}</p>
-		`;
-		container.appendChild(div);
-	});
+    const posts = await res.json();
+
+    const container = document.getElementById("posts");
+    container.innerHTML = "";
+
+    posts.forEach(p => {
+        const div = document.createElement("div");
+        div.className = "post-card";
+        div.innerHTML = `
+            <p><strong>User ${p.userId}</strong></p>
+            <p>${p.content}</p>
+        `;
+        container.appendChild(div);
+    });
 }
+
 
 async function createPost() {
 	const content = document.getElementById("content").value.trim();
@@ -193,10 +200,16 @@ async function leaveCommunity() {
 async function deleteCommunity() {
 	if (!confirm("Delete this community permanently?")) return;
 
-	await fetch(
-		`http://localhost:8080/api/community/delete/${communityId}/${currentUser.id}`,
+	const res = await fetch(
+		`http://localhost:8080/api/community/${communityId}?userId=${currentUser.id}`,
 		{ method: "DELETE" }
 	);
+
+	if (!res.ok) {
+		const msg = await res.text();
+		alert(msg);
+		return;
+	}
 
 	window.location.href = "communities.html";
 }

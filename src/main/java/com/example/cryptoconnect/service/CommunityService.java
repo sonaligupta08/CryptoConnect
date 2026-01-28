@@ -10,58 +10,60 @@ import com.example.cryptoconnect.repository.CommunityRepository;
 @Service
 public class CommunityService {
 
-	@Autowired
-	private CommunityMemberRepository memberRepo;
-	
-	@Autowired
-	private CommunityRepository communityRepo;
+    @Autowired
+    private CommunityMemberRepository memberRepo;
 
-	// Add member
-	public void addMember(Long communityId, Long userId) {
+    @Autowired
+    private CommunityRepository communityRepo;
 
-		if (memberRepo.existsByCommunityIdAndUserId(communityId, userId)) {
-			return;
-		}
+    
+    public void addMember(Long communityId, Long userId) {
 
-		long count = memberRepo.countByCommunityId(communityId);
+       
+        if (memberRepo.existsByCommunityIdAndUserId(communityId, userId)) {
+            return;
+        }
 
-		if (count >= 5) {
-			throw new RuntimeException("Community is full");
-		}
+        long count = memberRepo.countByCommunityId(communityId);
 
-		CommunityMember member = new CommunityMember();
-		member.setCommunityId(communityId);
-		member.setUserId(userId);
+        
+        if (count >= 5) {
+            throw new RuntimeException("Community is full");
+        }
 
-		if (count == 0) {
-			member.setRole("ADMIN");
-		} else {
-			member.setRole("MEMBER");
-		}
+        CommunityMember member = new CommunityMember();
+        member.setCommunityId(communityId);
+        member.setUserId(userId);
 
-		memberRepo.save(member);
-	}
+        
+        if (count == 0) {
+            member.setRole("ADMIN");
+        } else {
+            member.setRole("MEMBER");
+        }
 
-	// delete member
+        memberRepo.save(member);
+    }
 
-	public void deleteCommunity(Long communityId, Long userId) {
+   
+    public String getUserRole(Long communityId, Long userId) {
+        return memberRepo.findByCommunityIdAndUserId(communityId, userId)
+                .map(CommunityMember::getRole)
+                .orElse("NONE");
+    }
 
-		CommunityMember member = memberRepo.findByCommunityIdAndUserId(communityId, userId)
-				.orElseThrow(() -> new RuntimeException("User is not a member"));
+   
+    public void deleteCommunity(Long communityId, Long userId) {
 
-		if (!"ADMIN".equals(member.getRole())) {
-			throw new RuntimeException("Only ADMIN can delete community");
-		}
+        
+        String role = getUserRole(communityId, userId);
 
-		memberRepo.deleteByCommunityId(communityId);
-		communityRepo.deleteById(communityId);
-	}
-	
-	public String getUserRole(Long communityId, Long userId) {
-	    return memberRepo.findByCommunityIdAndUserId(communityId, userId)
-	            .map(CommunityMember::getRole)
-	            .orElse("NONE");
-	}
+        if (!"ADMIN".equals(role)) {
+            throw new RuntimeException("Only ADMIN can delete the community");
+        }
 
-
+    
+        memberRepo.deleteByCommunityId(communityId);
+        communityRepo.deleteById(communityId);
+    }
 }

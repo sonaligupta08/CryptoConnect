@@ -18,10 +18,10 @@
 <script
 	src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 
-
 <title>Dashboard</title>
 
 <style>
+/* --- Styles kept as your original --- */
 body {
 	margin: 0;
 	font-family: "Poppins", sans-serif;
@@ -29,11 +29,13 @@ body {
 	color: #fff;
 }
 
+/* Flex container for sidebar and content */
 .outer {
 	display: flex;
 	height: 100vh;
 }
 
+/* Sidebar styles */
 .sidebar {
 	color: #fff !important;
 	background-color: #000;
@@ -276,7 +278,8 @@ body {
 					<ul>
 						<li><i class='bx bx-home'></i> Home</li>
 						<li><i class='bx bx-bell'></i> Notification</li>
-						<li onclick="window.location.href='message.html'"><i class='bx bx-message'></i> Messages</li>
+						<li onclick="window.location.href='message.html'"><i
+							class='bx bx-message'></i> Messages</li>
 
 						<li onclick="openCommunities()"><i class='bx bx-group'></i>
 							Communities</li>
@@ -285,7 +288,6 @@ body {
 							class='bx bx-user'></i> Profile</li>
 					</ul>
 				</div>
-
 
 				<div class="profile-section">
 					<div class="profile-pic">?</div>
@@ -317,10 +319,17 @@ body {
 							class="fa-regular fa-image"></i>
 						</a> <a><i class='bx bx-smile'></i></a>
 
+						<!-- Post button listener added in JS below -->
 						<button class="post" type="button">Post</button>
+
+						<button id="connectWalletBtn" class="btn btn-outline-warning mb-2">
+							Connect Wallet</button>
+
+						<p id="walletAddress" style="font-size: 12px; color: #aaa;"></p>
 					</div>
 				</div>
 
+				<!-- Posts container -->
 				<div id="post-feed"></div>
 			</div>
 
@@ -348,20 +357,43 @@ body {
 
 	<!-- SCRIPT -->
 	<script>
-		// Get logged-in user
+		// Get logged-in user from localStorage
 		const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+		
+		// Wallet Connect Elements
+		const walletBtn = document.getElementById("connectWalletBtn");
+		const walletDisplay = document.getElementById("walletAddress");
 
+		// Wallet connect logic
+		walletBtn.addEventListener("click", async () => {
+		    if (window.ethereum) {
+		        try {
+		            const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+		            const address = accounts[0];
+		            walletDisplay.innerText = address;
+		            currentUser.walletAddress = address;
+		            localStorage.setItem("currentUser", JSON.stringify(currentUser));
+		        } catch (err) {
+		            alert("Wallet connection failed");
+		            console.error(err);
+		        }
+		    } else {
+		        alert("MetaMask not found");
+		    }
+		});
+
+		// Redirect to login if user not logged in
 		if (!currentUser.username) {
 			alert("Please login first");
 			window.location.href = "login.html";
 		}
 
-		// Update user info
+		// Update profile info
 		document.querySelectorAll(".username").forEach(el => el.innerText = currentUser.username);
 		document.querySelectorAll(".handle").forEach(el => el.innerText = "@" + currentUser.username);
 		document.querySelectorAll(".profile-pic").forEach(el => el.innerText = currentUser.username.charAt(0).toUpperCase());
 
-		// Load posts
+		// Function to load posts from backend
 		async function loadPosts() {
 			try {
 				const res = await fetch(`http://localhost:8080/api/posts/all`);
@@ -383,16 +415,13 @@ body {
 		                </div>
 		                <p class="post-text">${post.content}</p>
 		                ${post.imageUrl ? `<img src="${post.imageUrl}" style="width:100%; border-radius:12px;">` : ""}
-						
 						<div class="action-buttons">
-											<button onclick="toggleLike(${post.id})">
-												<i class='bx bx-heart' id="like-icon-${post.id}"></i>
-											</button>
-
-											<span id="like-count-${post.id}" style="cursor:pointer"></span>
+							<button onclick="toggleLike(${post.id})">
+								<i class='bx bx-heart' id="like-icon-${post.id}"></i>
+							</button>
+							<span id="like-count-${post.id}" style="cursor:pointer"></span>
 					   </div>
 		            `;
-
 					container.appendChild(div);
 					loadLikeStatus(post.id);
 					loadLikeCount(post.id);
@@ -402,6 +431,8 @@ body {
 				console.error("Failed to load posts", err);
 			}
 		}
+
+		// Like toggle function
 		async function toggleLike(postId) {
 			await fetch("http://localhost:8080/api/likes/toggle", {
 				method: "POST",
@@ -412,62 +443,63 @@ body {
 					username: currentUser.username
 				})
 			});
-
 			loadLikeStatus(postId);
 			loadLikeCount(postId);
 		}
 
+		// Load like count
 		async function loadLikeCount(postId) {
 			const res = await fetch(`http://localhost:8080/api/likes/count/${postId}`);
 			const count = await res.text();
-
 			document.getElementById(`like-count-${postId}`).innerText = count + " Likes";
 		}
 
+		// Load like status (red heart or empty)
 		async function loadLikeStatus(postId) {
 			const res = await fetch(
 				`http://localhost:8080/api/likes/status/${postId}/${currentUser.id}`
 			);
-
 			const liked = await res.json();
 			const icon = document.getElementById(`like-icon-${postId}`);
-
 			icon.className = liked ? "bx bxs-heart" : "bx bx-heart";
 			icon.style.color = liked ? "#ff4d4d" : "white";
 		}
 
-
-
-		// Post new content
+		// Post new content listener
 		document.querySelector(".post").addEventListener("click", async () => {
 			const content = document.getElementById("input").value.trim();
 			if (!content) return alert("Write something to post!");
 
+			// Generate post hash
+			const postHash = btoa((currentUser.walletAddress || "guest") + "_" + content + "_" + new Date().getTime());
+
 			try {
-				const res = await fetch("http://localhost:8080/api/posts/create", {
+				await fetch("http://localhost:8080/api/posts/create", {
 					method: "POST",
-					headers: {"Content-Type": "application/json"},
+					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({
 						userId: currentUser.id,
-						username: currentUser.username,
 						content: content,
+						postHash: postHash,
+						walletAddress: currentUser.walletAddress,
 						imageUrl: selectedImage || null
 					})
 				});
 
-				if (res.ok) {
-					document.getElementById("input").value = "";
-					document.getElementById("image-preview").innerHTML = "";
-					selectedImage = null;
-					loadPosts();
-				}
+				document.getElementById("input").value = "";
+				document.getElementById("image-preview").innerHTML = "";
+				selectedImage = null;
+
+				// Reload posts
+				loadPosts();
 
 			} catch (err) {
 				console.error("Failed to post", err);
+				alert("Failed to post content");
 			}
 		});
 
-		// Image preview
+		// Image preview logic
 		const imageInput = document.getElementById("imageUpload");
 		let selectedImage = null;
 
@@ -483,38 +515,31 @@ body {
 			reader.readAsDataURL(file);
 		});
 
-		// Initial load
+		// Initial load of posts
 		loadPosts();
 		
+		// Open communities page
 		function openCommunities() {
 			window.location.href = "communities.html";
 		}
 
+		// WebSocket/STOMP setup
 		let stompClient = null;
-		
-
 		function connectSocket() {
 		    const socket = new SockJS("http://localhost:8080/ws");
 		    stompClient = Stomp.over(socket);
-
 		    stompClient.connect({}, () => {
-
-		    	// NOTIFICATIONS
+		    	// Subscribe to notifications
 		    	stompClient.subscribe("/topic/notifications", (msg) => {
 		    	    const data = JSON.parse(msg.body);
 		    	    console.log("Notification:", data);
 		    	    alert(`Notification: ${data.content}`);
 		    	});
-
-
 		    });
 		}
 
 		connectSocket();
-
 	</script>
 
-
 </body>
-
 </html>
