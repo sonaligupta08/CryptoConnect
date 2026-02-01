@@ -8,10 +8,10 @@ import com.example.cryptoconnect.entity.Post;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
+	List<Post> findByUserId(Long userId);
 
-    List<Post> findByUserId(Long userId);
-    
-    List<Post> findByIdIn(List<Long> ids);
+	List<Post> findAllByOrderByCreatedAtDesc();
 
+	List<Post> findByIdIn(List<Long> ids);
 
 }

@@ -1,38 +1,39 @@
 package com.example.cryptoconnect.service;
 
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.web3j.protocol.Web3j;
+import org.web3j.crypto.Credentials;
+import org.web3j.tx.gas.DefaultGasProvider;
+import com.example.cryptoconnect.blockchain.PostRegistry;
 
 @Service
 public class BlockchainService {
 
-    
-    private static final String CONTRACT_ADDRESS =
-            "0xd9145CCE52D386f254917e481eB44e9943F39138";
+    private PostRegistry postRegistry;
 
     @Autowired
-    private Web3j web3j;
+    public BlockchainService(Web3j web3j, Credentials credentials) {
 
-    @PostConstruct
-    public void init() {
+        this.postRegistry = PostRegistry.load(
+            "0xd9145CCE52D386f254917e481eB44e9943F39138",
+            web3j,
+            credentials,
+            new DefaultGasProvider()
+        );
+    }
+
+    public String savePostHashToBlockchain(String hash) {
         try {
-            String clientVersion = web3j.web3ClientVersion().send().getWeb3ClientVersion();
-            System.out.println("Blockchain client connected: " + clientVersion);
+            return postRegistry
+                    .storePost(hash)
+                    .send()
+                    .getTransactionHash();
         } catch (Exception e) {
-            System.out.println("Blockchain connection running in simulated mode");
+            System.out.println("Blockchain save failed: " + e.getMessage());
+            return null;
         }
     }
-    public String savePostHashToBlockchain(String postHash) {
-
-        System.out.println("=================================");
-        System.out.println("Storing post hash on blockchain");
-        System.out.println("Contract Address: " + CONTRACT_ADDRESS);
-        System.out.println("Post Hash: " + postHash);
-        System.out.println("Status: Stored as blockchain proof (simulated)");
-        System.out.println("=================================");
-
-        return postHash;
-    }
 }
+
+

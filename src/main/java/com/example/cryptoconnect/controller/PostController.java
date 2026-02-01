@@ -24,14 +24,21 @@ public class PostController {
 
 	@Autowired
 	private PostRepository postRepository;
-	
+
 	@Autowired
 	private BlockchainService blockchainService;
 
 //creating post
 	@PostMapping("/create")
 	public Post createPost(@RequestBody Post post) {
-		blockchainService.savePostHashToBlockchain(post.getPostHash());
+
+		if (post.getUsername() == null || post.getUsername().isEmpty()) {
+			post.setUsername("anonymous");
+		}
+		if (post.getPostHash() != null) {
+			blockchainService.savePostHashToBlockchain(post.getPostHash());
+		}
+
 		return postRepository.save(post);
 	}
 
@@ -57,16 +64,13 @@ public class PostController {
 
 		postRepository.deleteById(postId);
 		return ResponseEntity.ok().build();
-		
-		
+
 	}
-	
-	//get all posts
+
+	// get all posts
 	@GetMapping("/all")
 	public List<Post> getAllPosts() {
-		return postRepository.findAll();
+		return postRepository.findAllByOrderByCreatedAtDesc();
 	}
-	
-	
 
 }

@@ -383,15 +383,19 @@ body {
 		});
 
 		// Redirect to login if user not logged in
-		if (!currentUser.username) {
+		if (!currentUser.id) {
 			alert("Please login first");
 			window.location.href = "login.html";
 		}
 
-		// Update profile info
-		document.querySelectorAll(".username").forEach(el => el.innerText = currentUser.username);
-		document.querySelectorAll(".handle").forEach(el => el.innerText = "@" + currentUser.username);
-		document.querySelectorAll(".profile-pic").forEach(el => el.innerText = currentUser.username.charAt(0).toUpperCase());
+		const displayName = currentUser.username || "Guest";
+
+		document.querySelectorAll(".username").forEach(el => el.innerText = displayName);
+		document.querySelectorAll(".handle").forEach(el => el.innerText = "@" + displayName);
+		document.querySelectorAll(".profile-pic").forEach(el =>
+		  el.innerText = displayName.charAt(0).toUpperCase()
+		);
+
 
 		// Function to load posts from backend
 		async function loadPosts() {
@@ -479,9 +483,10 @@ body {
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({
 						userId: currentUser.id,
+						username: currentUser.username,
 						content: content,
 						postHash: postHash,
-						walletAddress: currentUser.walletAddress,
+						walletAddress: currentUser.walletAddress || null,
 						imageUrl: selectedImage || null
 					})
 				});
