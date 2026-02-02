@@ -407,28 +407,50 @@ body {
 				container.innerHTML = "";
 
 				posts.forEach(post => {
-					const div = document.createElement("div");
-					div.className = "post-card";
-					div.innerHTML = `
-		                <div class="profile-section">
-		                    <div class="profile-pic">${post.username.charAt(0).toUpperCase()}</div>
-		                    <div>
-		                        <p class="username">${post.username}</p>
-		                        <p class="handle">@${post.username}</p>
-		                    </div>
-		                </div>
-		                <p class="post-text">${post.content}</p>
-		                ${post.imageUrl ? `<img src="${post.imageUrl}" style="width:100%; border-radius:12px;">` : ""}
-						<div class="action-buttons">
-							<button onclick="toggleLike(${post.id})">
-								<i class='bx bx-heart' id="like-icon-${post.id}"></i>
-							</button>
-							<span id="like-count-${post.id}" style="cursor:pointer"></span>
-					   </div>
-		            `;
-					container.appendChild(div);
-					loadLikeStatus(post.id);
-					loadLikeCount(post.id);
+				    const div = document.createElement("div");
+				    div.className = "post-card";
+
+				    if (post.deleted) {
+				        // 🔒 Deleted post view
+				        div.innerHTML = `
+				            <div class="profile-section">
+				                <div class="profile-pic">${post.username.charAt(0)}</div>
+				                <div>
+				                    <p class="username">${post.username}</p>
+				                    <p class="handle">@${post.username}</p>
+				                </div>
+				            </div>
+
+				            <p class="post-text" style="color:#71767b; font-style:italic;">
+				                This post was deleted
+				            </p>
+				        `;
+				    } else {
+				        div.innerHTML = `
+				            <div class="profile-section">
+				                <div class="profile-pic">${post.username.charAt(0)}</div>
+				                <div>
+				                    <p class="username">${post.username}</p>
+				                    <p class="handle">@${post.username}</p>
+				                </div>
+				            </div>
+
+				            <p class="post-text">${post.content}</p>
+
+				            ${post.imageUrl ? `
+				                <img src="${post.imageUrl}" style="width:100%; border-radius:12px;">
+				            ` : ""}
+
+				            ${post.userId === currentUser.id ? `
+				                <button onclick="deletePost(${post.id})"
+				                    style="color:#ff4d4d; background:none; border:none; margin-top:8px;">
+				                    Delete
+				                </button>
+				            ` : ""}
+				        `;
+				    }
+
+				    container.appendChild(div);
 				});
 
 			} catch (err) {
@@ -544,6 +566,17 @@ body {
 		}
 
 		connectSocket();
+		
+		async function deletePost(postId) {
+		    if (!confirm("Delete this post?")) return;
+
+		    await fetch(`http://localhost:8080/api/posts/${postId}/delete/${currentUser.id}`, {
+		        method: "POST"
+		    });
+
+		    loadPosts();
+		}
+
 	</script>
 
 </body>

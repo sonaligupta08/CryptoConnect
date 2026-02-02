@@ -23,7 +23,16 @@ public class Post {
 	private String imageUrl;
 	private String postHash;
 	private String walletAddress;
+	private boolean deleted = false;
 	
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
+	}
+
 	public String getPostHash() {
 		return postHash;
 	}

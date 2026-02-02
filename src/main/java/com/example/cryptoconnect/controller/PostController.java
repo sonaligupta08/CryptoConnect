@@ -49,7 +49,7 @@ public class PostController {
 	}
 
 //delete post
-	@DeleteMapping("/{postId}/user/{userId}")
+	@PostMapping("/{postId}/delete/{userId}")
 	public ResponseEntity<?> deletePost(@PathVariable Long postId, @PathVariable Long userId) {
 
 		Post post = postRepository.findById(postId).orElse(null);
@@ -62,9 +62,13 @@ public class PostController {
 			return ResponseEntity.status(403).body("Not allowed");
 		}
 
-		postRepository.deleteById(postId);
-		return ResponseEntity.ok().build();
+		post.setDeleted(true);
+		post.setContent("This post was deleted");
+		post.setImageUrl(null);
 
+		postRepository.save(post);
+
+		return ResponseEntity.ok("Post deleted successfully");
 	}
 
 	// get all posts
