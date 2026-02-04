@@ -58,8 +58,6 @@ public class SecurityConfig {
                 .requestMatchers("/api/users/**").permitAll()
                 .requestMatchers("/api/posts/**").permitAll()
                 .requestMatchers("/api/likes/**").permitAll()
-                .requestMatchers("/api/community/**").permitAll()
-                .requestMatchers("/api/community-posts/**").permitAll()
                 .requestMatchers("/uploads/**").permitAll()
 
                 
@@ -71,8 +69,6 @@ public class SecurityConfig {
                         "/dashboard.html",
                         "/profile.html",
                         "/about.html",
-                        "/communities.html",
-                        "/community.html",
                         "/message.html",
                         "/profilesetup.html"
                 ).permitAll()

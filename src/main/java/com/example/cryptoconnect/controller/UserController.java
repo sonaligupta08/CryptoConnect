@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -27,30 +28,41 @@ public class UserController {
 	private UserRepository userRepository;
 
 	@PutMapping("/profile/{id}")
-	public User updateProfile(@PathVariable Long id, @RequestParam String username,
-			@RequestParam(required = false) String bio, @RequestParam(required = false) MultipartFile profileImage)
-			throws IOException {
+	public ResponseEntity<User> updateProfile(
+			@PathVariable Long id,
+			@RequestParam String username,
+			@RequestParam(required = false) String bio,
+			@RequestParam(required = false) MultipartFile profileImage) {
 
-		User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+		User user = userRepository.findById(id)
+				.orElseThrow(() -> new RuntimeException("User not found"));
 
 		user.setUsername(username);
 		user.setBio(bio);
 
 		if (profileImage != null && !profileImage.isEmpty()) {
-			String fileName = System.currentTimeMillis() + "_" + profileImage.getOriginalFilename();
-			Path uploadPath = Paths.get("src/main/resources/static/uploads");
-
-			if (!Files.exists(uploadPath)) {
-				Files.createDirectories(uploadPath);
-			}
-
-			Files.copy(profileImage.getInputStream(), uploadPath.resolve(fileName),
-					StandardCopyOption.REPLACE_EXISTING);
-
-			user.setProfileImage("/uploads/" + fileName);
+			String imageUrl = saveImage(profileImage);
+			user.setProfileImage(imageUrl);
 		}
 
-		return userRepository.save(user);
+		userRepository.save(user);
+		return ResponseEntity.ok(user);
 	}
 
+	private String saveImage(MultipartFile file) {
+		try {
+			String uploadDir = "src/main/resources/static/uploads/";
+			Files.createDirectories(Paths.get(uploadDir));
+
+			String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+			Path filePath = Paths.get(uploadDir + fileName);
+
+			Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+			return "/uploads/" + fileName;
+
+		} catch (IOException e) {
+			throw new RuntimeException("Image upload failed");
+		}
+	}
 }

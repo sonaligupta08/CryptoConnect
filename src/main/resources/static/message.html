@@ -76,29 +76,48 @@ body.dark {
 let stompClient = null;
 
 const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
-const receiverUser = "admin";
+const urlParams = new URLSearchParams(window.location.search);
+const receiverUser = urlParams.get("user");
 
 if (!currentUser.username) {
 	alert("Please login first");
 	window.location.href = "login.html";
 }
 
+// 1️⃣ CONNECT SOCKET PROPERLY
 function connectSocket() {
-	const socket = new SockJS("http://localhost:8080/ws");
+	const socket = new SockJS(
+		"http://localhost:8080/ws?username=" + currentUser.username
+	);
+
 	stompClient = Stomp.over(socket);
 
 	stompClient.connect({}, () => {
+
+		console.log("Connected as", currentUser.username);
+
+		// 2️⃣ SUBSCRIBE AFTER CONNECT
 		stompClient.subscribe("/user/queue/messages", (msg) => {
 			const data = JSON.parse(msg.body);
-			if (data.sender !== currentUser.username) {
-				showMessage(data.sender, data.content, false);
+
+			if (
+				(data.sender === receiverUser && data.receiver === currentUser.username) ||
+				(data.sender === currentUser.username && data.receiver === receiverUser)
+			) {
+				showMessage(
+					data.sender === currentUser.username ? "You" : data.sender,
+					data.content,
+					data.sender === currentUser.username
+				);
 			}
 		});
 	});
 }
 
+// connect socket
 connectSocket();
 
+// load chat history
 async function loadChat(receiver) {
 	const res = await fetch(
 		`http://localhost:8080/api/chat/${currentUser.username}/${receiver}`
@@ -119,10 +138,10 @@ async function loadChat(receiver) {
 
 loadChat(receiverUser);
 
+// send message
 function sendMessage() {
 	const input = document.getElementById("messageInput");
 	const content = input.value.trim();
-
 	if (!content) return;
 
 	const message = {
@@ -132,10 +151,10 @@ function sendMessage() {
 	};
 
 	stompClient.send("/app/chat.send", {}, JSON.stringify(message));
-	showMessage("You", content, true);
 	input.value = "";
 }
 
+// show message
 function showMessage(sender, text, isSender) {
 	const box = document.getElementById("message-box");
 

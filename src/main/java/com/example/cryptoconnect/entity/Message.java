@@ -18,6 +18,16 @@ public class Message {
     private String content;
 
     private LocalDateTime timestamp;
+    
+    private boolean seen;
+
+	public boolean isSeen() {
+		return seen;
+	}
+
+	public void setSeen(boolean seen) {
+		this.seen = seen;
+	}
 
 	public Long getId() {
 		return id;

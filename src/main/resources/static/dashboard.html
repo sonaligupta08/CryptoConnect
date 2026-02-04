@@ -281,8 +281,6 @@ body {
 						<li onclick="window.location.href='message.html'"><i
 							class='bx bx-message'></i> Messages</li>
 
-						<li onclick="openCommunities()"><i class='bx bx-group'></i>
-							Communities</li>
 
 						<li onclick="window.location.href='profile.html'"><i
 							class='bx bx-user'></i> Profile</li>
@@ -500,18 +498,22 @@ body {
 			const postHash = btoa((currentUser.walletAddress || "guest") + "_" + content + "_" + new Date().getTime());
 
 			try {
+				const formData = new FormData();
+				formData.append("userId", currentUser.id);
+				formData.append("username", currentUser.username);
+				formData.append("content", content);
+				formData.append("postHash", postHash);
+				formData.append("walletAddress", currentUser.walletAddress || "");
+
+				if (imageInput.files[0]) {
+				  formData.append("image", imageInput.files[0]);
+				}
+
 				await fetch("http://localhost:8080/api/posts/create", {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({
-						userId: currentUser.id,
-						username: currentUser.username,
-						content: content,
-						postHash: postHash,
-						walletAddress: currentUser.walletAddress || null,
-						imageUrl: selectedImage || null
-					})
+				  method: "POST",
+				  body: formData
 				});
+
 
 				document.getElementById("input").value = "";
 				document.getElementById("image-preview").innerHTML = "";
@@ -545,16 +547,16 @@ body {
 		// Initial load of posts
 		loadPosts();
 		
-		// Open communities page
-		function openCommunities() {
-			window.location.href = "communities.html";
-		}
 
 		// WebSocket/STOMP setup
 		let stompClient = null;
 		function connectSocket() {
-		    const socket = new SockJS("http://localhost:8080/ws");
-		    stompClient = Stomp.over(socket);
+			const socket = new SockJS(
+					  "http://localhost:8080/ws?username=" + currentUser.username
+					);
+					const stompClient = Stomp.over(socket);
+
+		    
 		    stompClient.connect({}, () => {
 		    	// Subscribe to notifications
 		    	stompClient.subscribe("/topic/notifications", (msg) => {

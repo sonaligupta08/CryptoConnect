@@ -5,13 +5,13 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.cryptoconnect.entity.Post;
 import com.example.cryptoconnect.repository.PostRepository;
@@ -22,59 +22,70 @@ import com.example.cryptoconnect.service.BlockchainService;
 @RequestMapping("/api/posts")
 public class PostController {
 
-	@Autowired
-	private PostRepository postRepository;
+    @Autowired
+    private PostRepository postRepository;
 
-	@Autowired
-	private BlockchainService blockchainService;
+    @Autowired
+    private BlockchainService blockchainService;
 
-//creating post
-	@PostMapping("/create")
-	public Post createPost(@RequestBody Post post) {
+    // creating post
+    @PostMapping("/create")
+    public Post createPost(
+            @RequestParam Long userId,
+            @RequestParam String username,
+            @RequestParam String content,
+            @RequestParam(required = false) String postHash,
+            @RequestParam(required = false) String walletAddress,
+            @RequestParam(required = false) MultipartFile image
+    ) {
 
-		if (post.getUsername() == null || post.getUsername().isEmpty()) {
-			post.setUsername("anonymous");
-		}
-		if (post.getPostHash() != null) {
-			blockchainService.savePostHashToBlockchain(post.getPostHash());
-		}
+        Post post = new Post();
+        post.setUserId(userId);
+        post.setUsername(username);
+        post.setContent(content);
+        post.setPostHash(postHash);
+        post.setWalletAddress(walletAddress);
+        post.setDeleted(false);
 
-		return postRepository.save(post);
-	}
+        if (image != null && !image.isEmpty()) {
+            post.setImageUrl(image.getOriginalFilename());
+        }
 
-//get post of a user
-	@GetMapping("/user/{userId}")
-	public List<Post> getPostByUser(@PathVariable Long userId) {
-		return postRepository.findByUserId(userId);
-	}
+        return postRepository.save(post);
+    }
 
-//delete post
-	@PostMapping("/{postId}/delete/{userId}")
-	public ResponseEntity<?> deletePost(@PathVariable Long postId, @PathVariable Long userId) {
+    // get post of a user
+    @GetMapping("/user/{userId}")
+    public List<Post> getPostByUser(@PathVariable Long userId) {
+        return postRepository.findByUserId(userId);
+    }
 
-		Post post = postRepository.findById(postId).orElse(null);
+    // delete post
+    @PostMapping("/{postId}/delete/{userId}")
+    public ResponseEntity<?> deletePost(@PathVariable Long postId, @PathVariable Long userId) {
 
-		if (post == null) {
-			return ResponseEntity.notFound().build();
-		}
+        Post post = postRepository.findById(postId).orElse(null);
 
-		if (!post.getUserId().equals(userId)) {
-			return ResponseEntity.status(403).body("Not allowed");
-		}
+        if (post == null) {
+            return ResponseEntity.notFound().build();
+        }
 
-		post.setDeleted(true);
-		post.setContent("This post was deleted");
-		post.setImageUrl(null);
+        if (!post.getUserId().equals(userId)) {
+            return ResponseEntity.status(403).body("Not allowed");
+        }
 
-		postRepository.save(post);
+        post.setDeleted(true);
+        post.setContent("This post was deleted");
+        post.setImageUrl(null);
 
-		return ResponseEntity.ok("Post deleted successfully");
-	}
+        postRepository.save(post);
 
-	// get all posts
-	@GetMapping("/all")
-	public List<Post> getAllPosts() {
-		return postRepository.findAllByOrderByCreatedAtDesc();
-	}
+        return ResponseEntity.ok("Post deleted successfully");
+    }
 
+    // get all posts
+    @GetMapping("/all")
+    public List<Post> getAllPosts() {
+        return postRepository.findAllByOrderByCreatedAtDesc();
+    }
 }

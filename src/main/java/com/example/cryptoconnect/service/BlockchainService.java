@@ -1,10 +1,12 @@
 package com.example.cryptoconnect.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.web3j.protocol.Web3j;
 import org.web3j.crypto.Credentials;
 import org.web3j.tx.gas.DefaultGasProvider;
+
 import com.example.cryptoconnect.blockchain.PostRegistry;
 
 @Service
@@ -12,11 +14,14 @@ public class BlockchainService {
 
     private PostRegistry postRegistry;
 
+    @Value("${blockchain.contract.address}")
+    private String contractAddress;
+
     @Autowired
     public BlockchainService(Web3j web3j, Credentials credentials) {
 
         this.postRegistry = PostRegistry.load(
-            "0xd9145CCE52D386f254917e481eB44e9943F39138",
+            contractAddress,
             web3j,
             credentials,
             new DefaultGasProvider()
@@ -35,5 +40,3 @@ public class BlockchainService {
         }
     }
 }
-
-
