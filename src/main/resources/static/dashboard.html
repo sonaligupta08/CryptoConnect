@@ -32,7 +32,7 @@ body {
 /* Flex container for sidebar and content */
 .outer {
 	display: flex;
-	height: 100vh;
+	min-height: 100vh;
 }
 
 /* Sidebar styles */
@@ -260,6 +260,27 @@ body {
 	border-radius: 12px;
 	margin-top: 10px;
 	border: 1px solid #2f3336;
+}
+
+@media ( max-width : 768px) {
+	.content {
+		padding: 1rem;
+	}
+	.divide .profile-section {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+	#input {
+		width: 100%;
+		font-size: 0.95rem;
+	}
+	.emojis {
+		flex-wrap: wrap;
+		gap: 10px;
+	}
+	.wallet-btn, #connectWalletBtn {
+		width: 100%;
+	}
 }
 </style>
 </head>
