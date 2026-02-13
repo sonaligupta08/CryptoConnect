@@ -28,22 +28,25 @@ public class ChatSocketController {
         m.setReceiver(chat.getReceiver());
         m.setContent(chat.getContent());
         m.setTimestamp(LocalDateTime.now());
+        m.setSeen(false);
 
-        messageRepo.save(m);
+        // save first
+        Message saved = messageRepo.save(m);
 
-        // send to receiver
+        // send saved message to receiver
         messagingTemplate.convertAndSendToUser(
             chat.getReceiver(),
             "/queue/messages",
-            chat
+            saved
         );
 
-        // optional: send back to sender
+        // send to sender (for instant UI)
         messagingTemplate.convertAndSendToUser(
             chat.getSender(),
             "/queue/messages",
-            chat
+            saved
         );
     }
+
 }
 

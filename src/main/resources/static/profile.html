@@ -140,6 +140,9 @@ body {
 						<p class="profile-bio" id="displayBio"></p>
 						<button id="editProfileBtn" class="btn btn-outline-primary mt-2">Edit
 							Profile</button>
+
+						<button id="messageBtn" class="btn btn-primary mt-2 ms-2">
+							Message</button>
 					</div>
 				</div>
 
@@ -169,9 +172,15 @@ async function loadUserPosts() {
 		location.href = "login.html";
 		return;
 	}
+
 	document.getElementById("profileName").innerText = currentUser.username;
 	document.getElementById("displayBio").innerText = currentUser.bio || "No bio yet";
-	document.getElementById("profileImg").src = currentUser.profileImage || "default.png";
+
+	// ✅ FIXED profile image path handling
+	document.getElementById("profileImg").src =
+		currentUser.profileImage
+		? "http://localhost:8080/" + currentUser.profileImage
+		: "default.png";
 
 	try {
 		const res = await fetch(`http://localhost:8080/api/posts/user/${currentUser.id}`);
@@ -218,9 +227,19 @@ function renderPosts() {
 
 			<p style="margin-top:10px">${post.content}</p>
 			${post.imageUrl ? `<img src="${post.imageUrl}" style="width:100%;border-radius:10px">` : ""}
+
+			<!-- ✅ LIKE SECTION ADDED -->
+			<div style="display:flex; gap:15px; margin-top:10px;">
+				<span style="cursor:pointer;" onclick="toggleLike(${post.id})">❤️ Like</span>
+				<span style="cursor:pointer;" onclick="showLikedUsers(${post.id})">👁 View Likes</span>
+				<span id="like-count-${post.id}">0</span>
+			</div>
 		`;
 
 		container.appendChild(div);
+
+		// ✅ LOAD LIKE COUNT
+		loadLikeCount(post.id);
 	});
 }
 
@@ -228,10 +247,17 @@ async function deletePost(id) {
 	const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 	if (!confirm("Delete this post?")) return;
 
-	const res = await fetch(`http://localhost:8080/api/posts/${id}/user/${currentUser.id}`, { method: "DELETE" });
+	try {
+		const res = await fetch(
+			`http://localhost:8080/api/posts/${id}/user/${currentUser.id}`,
+			{ method: "DELETE" }
+		);
 
-	if (res.ok) loadUserPosts();
-	else alert("Not allowed");
+		if (res.ok) loadUserPosts();
+		else alert("Not allowed");
+	} catch {
+		alert("Delete failed");
+	}
 }
 
 async function toggleLike(postId) {
@@ -246,12 +272,17 @@ async function toggleLike(postId) {
 			username: currentUser.username
 		})
 	});
+
+	loadLikeCount(postId);
+
+	if (currentTab === "likes") loadLikedPosts();
 }
 
 async function loadLikeCount(postId) {
 	const res = await fetch(`http://localhost:8080/api/likes/count/${postId}`);
 	const count = await res.text();
-	document.getElementById(`like-count-${postId}`).innerText = count;
+	const el = document.getElementById(`like-count-${postId}`);
+	if (el) el.innerText = count;
 }
 
 async function showLikedUsers(postId) {
@@ -282,7 +313,25 @@ loadUserPosts();
 const editBtn = document.getElementById("editProfileBtn");
 editBtn.addEventListener("click", () =>{
 	window.location.href = "profilesetup.html"
-})
+});
+
+const urlParams = new URLSearchParams(window.location.search);
+const profileUser = urlParams.get("user");
+
+const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+
+//hide message button if viewing own profile
+if (profileUser === currentUser.username) {
+ document.getElementById("messageBtn").style.display = "none";
+}
+
+document.getElementById("messageBtn").onclick = () => {
+    if (!profileUser) {
+        alert("User not found");
+        return;
+    }
+    window.location.href = "message.html?user=" + profileUser;
+};
 </script>
 
 </body>

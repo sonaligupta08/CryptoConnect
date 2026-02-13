@@ -26,6 +26,7 @@ public class ChatRestController {
             @PathVariable String user1,
             @PathVariable String user2
     ) {
+    	 repo.markAsSeen(user2, user1);
         return repo.getChat(user1, user2);
     }
 }

@@ -61,8 +61,10 @@ body.dark {
 
 	<div class="chat-container">
 		<div class="chat-header">
-			<h3>CryptoConnect Chat</h3>
+			<h3 id="chatTitle">CryptoConnect Chat</h3>
+			<small id="loginInfo"></small>
 		</div>
+
 
 		<div id="message-box"></div>
 
@@ -78,6 +80,13 @@ let stompClient = null;
 const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
 const urlParams = new URLSearchParams(window.location.search);
 const receiverUser = urlParams.get("user");
+
+document.getElementById("chatTitle").innerText =
+    "Chat with " + receiverUser;
+
+document.getElementById("loginInfo").innerText =
+    "Logged in as " + currentUser.username;
+
 
 if (!currentUser.username) {
 	alert("Please login first");
@@ -107,7 +116,8 @@ function connectSocket() {
 				showMessage(
 					data.sender === currentUser.username ? "You" : data.sender,
 					data.content,
-					data.sender === currentUser.username
+					data.sender === currentUser.username,
+					data.id
 				);
 			}
 		});
@@ -131,7 +141,8 @@ async function loadChat(receiver) {
 		showMessage(
 			m.sender === currentUser.username ? "You" : m.sender,
 			m.content,
-			m.sender === currentUser.username
+			m.sender === currentUser.username,
+			m.id
 		);
 	});
 }
@@ -155,7 +166,14 @@ function sendMessage() {
 }
 
 // show message
-function showMessage(sender, text, isSender) {
+
+const displayedMessages = new Set();
+
+function showMessage(sender, text, isSender, id = null) {
+
+	if (id && displayedMessages.has(id)) return;
+	if (id) displayedMessages.add(id);
+
 	const box = document.getElementById("message-box");
 
 	const msg = document.createElement("div");
@@ -169,6 +187,7 @@ function showMessage(sender, text, isSender) {
 	box.appendChild(msg);
 	box.scrollTop = box.scrollHeight;
 }
+
 </script>
 
 </body>

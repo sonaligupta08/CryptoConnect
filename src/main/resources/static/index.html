@@ -2,201 +2,243 @@
 <html lang="en">
 
 <head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-	<!-- Bootstrap -->
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" />
+<!-- Bootstrap -->
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" />
 
-	<!-- Google Font -->
-	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+<!-- Google Font -->
+<link
+	href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap"
+	rel="stylesheet" />
 
-	<title>CryptoConnect</title>
+<title>CryptoConnect</title>
 
-	<style>
-		body {
-			background-color: #000;
-			color: #e0e0e0;
-			font-family: "Poppins", sans-serif;
-		}
+<style>
+html {
+	scroll-behavior: smooth;
+}
 
-		/* ---------- TOP BAR ---------- */
-		.top-bar {
-			background-color: #0b4d99;
-			padding: 10px;
-			text-align: center;
-			font-size: 1.2rem;
-		}
+body {
+	background-color: #000;
+	color: #e0e0e0;
+	font-family: "Poppins", sans-serif;
+}
 
-		/* ---------- NAVBAR ---------- */
-		#crypto {
-			color: #00bfff;
-			text-shadow: 0 0 8px #00bfff;
-			font-weight: 700;
-			font-size: 1.6rem;
-		}
+/* ---------- TOP BAR ---------- */
+.top-bar {
+	background-color: #0b4d99;
+	padding: 10px;
+	text-align: center;
+	font-size: 1.2rem;
+}
 
-		.coin-img {
-			height: 32px;
-			width: 32px;
-			border-radius: 50%;
-			box-shadow: 0 0 20px rgba(63, 121, 227, 0.9);
-		}
+/* ---------- NAVBAR ---------- */
+#crypto {
+	color: #00bfff;
+	text-shadow: 0 0 8px #00bfff;
+	font-weight: 700;
+	font-size: 1.6rem;
+}
 
-		.navbar {
-			background-color: white !important;
-		}
+.coin-img {
+	height: 32px;
+	width: 32px;
+	border-radius: 50%;
+	box-shadow: 0 0 20px rgba(63, 121, 227, 0.9);
+}
 
-		.navbar-nav .nav-link {
-			padding: 2px 8px !important;
-			color: #000 !important;
-			font-family: cursive;
-			font-weight: bold;
-			font-size: 20px;
-		}
+.navbar {
+	background-color: white !important;
+}
 
-		.navbar-nav .nav-link:hover {
-			color: #00bfff !important;
-		}
+.navbar-nav .nav-link {
+	padding: 2px 8px !important;
+	color: #000 !important;
+	font-family: cursive;
+	font-weight: bold;
+	font-size: 20px;
+}
 
-		/* ---------- HERO SECTION ---------- */
-		#text {
-			min-height: 100vh;
-			background-image: url("community.jpeg");
-			background-size: cover;
-			background-position: center;
-			position: relative;
-			padding: 40px 15px;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			text-align: center;
-		}
+.navbar-nav .nav-link:hover {
+	color: #00bfff !important;
+}
 
-		#text::before {
-			content: "";
-			position: absolute;
-			inset: 0;
-			background-color: rgba(0, 0, 0, 0.65);
-			z-index: 1;
-		}
+/* ---------- HERO SECTION ---------- */
+#text {
+	min-height: 100vh;
+	background-image: url("community.jpeg");
+	background-size: cover;
+	background-position: center;
+	position: relative;
+	padding: 40px 15px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+}
 
-		.glass-card {
-			position: relative;
-			z-index: 2;
-			background: rgba(255, 255, 255, 0.08);
-			backdrop-filter: blur(10px);
-			border-radius: 16px;
-			padding: 35px;
-			max-width: 500px;
-			width: 100%;
-			box-shadow: 0 0 40px rgba(0, 191, 255, 0.15);
-		}
+#text::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background-color: rgba(0, 0, 0, 0.65);
+	z-index: 1;
+}
 
-		.glass-card h2 {
-			color: #00bfff;
-			font-weight: 700;
-			margin-bottom: 15px;
-		}
+.glass-card {
+	position: relative;
+	z-index: 2;
+	background: rgba(255, 255, 255, 0.08);
+	backdrop-filter: blur(10px);
+	border-radius: 16px;
+	padding: 35px;
+	max-width: 500px;
+	width: 100%;
+	box-shadow: 0 0 40px rgba(0, 191, 255, 0.15);
+}
 
-		.glass-card p {
-			color: #ccc;
-			font-size: 1rem;
-		}
+.glass-card h2 {
+	color: #00bfff;
+	font-weight: 700;
+	margin-bottom: 15px;
+}
 
-		.btn-success {
-			background-color: #00bfff;
-			border: none;
-			color: #000;
-			font-weight: bold;
-			padding: 10px 25px;
-			margin-top: 15px;
-		}
+.glass-card p {
+	color: #ccc;
+	font-size: 1rem;
+}
 
-		.btn-success:hover {
-			background-color: #007bff;
-			color: #fff;
-			box-shadow: 0 0 12px #00bfff;
-		}
+.btn-success {
+	background-color: #00bfff;
+	border: none;
+	color: #000;
+	font-weight: bold;
+	padding: 10px 25px;
+	margin-top: 15px;
+}
 
-		/* ---------- FEATURES ---------- */
-		.feature-box {
-			background: #050b14;
-			padding: 25px;
-			border-radius: 12px;
-			box-shadow: 0 0 20px rgba(0, 191, 255, 0.1);
-			transition: 0.3s;
-			height: 100%;
-		}
+.btn-success:hover {
+	background-color: #007bff;
+	color: #fff;
+	box-shadow: 0 0 12px #00bfff;
+}
 
-		.feature-box:hover {
-			transform: translateY(-8px);
-			box-shadow: 0 0 30px rgba(0, 191, 255, 0.3);
-		}
+/* ---------- FEATURES ---------- */
+.feature-box {
+	background: #050b14;
+	padding: 25px;
+	border-radius: 12px;
+	box-shadow: 0 0 20px rgba(0, 191, 255, 0.1);
+	transition: 0.3s;
+	height: 100%;
+}
 
-		/* ---------- RESPONSIVE ---------- */
-		@media (max-width: 576px) {
-			.top-bar {
-				font-size: 0.8rem;
-			}
+.feature-box:hover {
+	transform: translateY(-8px) scale(1.02);
+	box-shadow: 0 0 35px rgba(0, 191, 255, 0.4);
+}
 
-			.glass-card {
-				padding: 25px;
-			}
+/* ---------- RESPONSIVE ---------- */
+@media ( max-width : 576px) {
+	.top-bar {
+		font-size: 0.8rem;
+	}
+	.glass-card {
+		padding: 25px;
+	}
+	.glass-card h2 {
+		font-size: 1.5rem;
+	}
+	.glass-card p {
+		font-size: 0.95rem;
+	}
+}
 
-			.glass-card h2 {
-				font-size: 1.5rem;
-			}
+/* MOBILE NAVBAR */
+@media ( max-width : 576px) {
+	.navbar {
+		padding-top: 4px !important;
+		padding-bottom: 4px !important;
+		min-height: auto !important;
+	}
+	.navbar-brand {
+		padding: 0 !important;
+	}
+	.navbar-brand img {
+		height: 26px;
+		width: 26px;
+	}
+	#crypto {
+		font-size: 1.2rem;
+	}
+}
 
-			.glass-card p {
-				font-size: 0.95rem;
-			}
-		}
+/* ---------- FOOTER ---------- */
+.footer {
+	background: #050b14;
+	border-top: 1px solid rgba(0, 191, 255, 0.2);
+	padding: 30px 15px 15px;
+	text-align: center;
+	margin-top: 60px;
+}
 
-		/* MOBILE NAVBAR */
-		@media (max-width: 576px) {
-			.navbar {
-				padding-top: 4px !important;
-				padding-bottom: 4px !important;
-				min-height: auto !important;
-			}
+.footer h5 {
+	color: #00bfff;
+	font-weight: 600;
+	margin-bottom: 10px;
+}
 
-			.navbar-brand {
-				padding: 0 !important;
-			}
+.footer p {
+	color: #aaa;
+	font-size: 0.9rem;
+	margin-bottom: 8px;
+}
 
-			.navbar-brand img {
-				height: 26px;
-				width: 26px;
-			}
+.footer a {
+	color: #00bfff;
+	text-decoration: none;
+	margin: 0 8px;
+	font-size: 0.95rem;
+}
 
-			#crypto {
-				font-size: 1.2rem;
-			}
-		}
-	</style>
+.footer a:hover {
+	color: #fff;
+	text-shadow: 0 0 6px #00bfff;
+}
+
+.footer-bottom {
+	margin-top: 15px;
+	padding-top: 10px;
+	border-top: 1px solid rgba(255, 255, 255, 0.1);
+	font-size: 0.8rem;
+	color: #777;
+}
+</style>
 </head>
 
 <body>
 
 	<!-- TOP BAR -->
-	<div class="top-bar text-white">
-		Join Our Crypto Community
-	</div>
+	<div class="top-bar text-white">Join Our Crypto Community</div>
 
 	<!-- NAVBAR -->
 	<nav class="navbar navbar-expand-lg navbar-light">
 		<div class="container-fluid">
-			<a class="navbar-brand d-flex align-items-center" href="#">
-				<img src="bitcoin.png.png" class="coin-img me-2" alt="logo" />
-				<span id="crypto">CryptoConnect</span>
+			<a class="navbar-brand d-flex align-items-center" href="#"> <img
+				src="bitcoin.png.png" class="coin-img me-2" alt="logo" /> <span
+				id="crypto">CryptoConnect</span>
 			</a>
 
-			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+			<button class="navbar-toggler" type="button"
+				data-bs-toggle="collapse" data-bs-target="#navbarNav">
 				<span class="navbar-toggler-icon"></span>
 			</button>
 
-			<div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+			<div class="collapse navbar-collapse justify-content-end"
+				id="navbarNav">
 				<ul class="navbar-nav">
 					<li class="nav-item"><a class="nav-link" href="#">Home</a></li>
 					<li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
@@ -210,10 +252,8 @@
 	<section id="text">
 		<div class="glass-card">
 			<h2>Welcome to CryptoConnect</h2>
-			<p>
-				Join the ultimate community for crypto enthusiasts.
-				Share, discuss, and stay updated on BTC, ETH, and more.
-			</p>
+			<p>Join the ultimate community for crypto enthusiasts. Share,
+				discuss, and stay updated on BTC, ETH, and more.</p>
 			<a href="signup.html">
 				<button class="btn btn-success">Get Started</button>
 			</a>
@@ -246,8 +286,24 @@
 		</div>
 	</section>
 
+	<!-- FOOTER -->
+	<footer class="footer">
+		<h5>CryptoConnect</h5>
+		<p>Connect • Share • Grow in the Crypto World</p>
+
+		<div>
+			<a href="#">Home</a> <a href="#">About</a> <a href="#">Privacy</a> <a
+				href="#">Contact</a>
+		</div>
+
+		<div class="footer-bottom">© 2025 CryptoConnect. All rights
+			reserved.</div>
+	</footer>
+
+
 	<!-- Bootstrap JS -->
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
