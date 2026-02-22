@@ -4,7 +4,12 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "messages")
+@Table(
+    name = "messages",
+    indexes = {
+        @Index(name = "chat_idx", columnList = "sender,receiver")
+    }
+)
 public class Message {
 
     @Id
@@ -18,56 +23,23 @@ public class Message {
     private String content;
 
     private LocalDateTime timestamp;
-    
     private boolean seen;
 
-	public boolean isSeen() {
-		return seen;
-	}
+    public boolean isSeen() { return seen; }
+    public void setSeen(boolean seen) { this.seen = seen; }
 
-	public void setSeen(boolean seen) {
-		this.seen = seen;
-	}
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-	public Long getId() {
-		return id;
-	}
+    public String getSender() { return sender; }
+    public void setSender(String sender) { this.sender = sender; }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public String getReceiver() { return receiver; }
+    public void setReceiver(String receiver) { this.receiver = receiver; }
 
-	public String getSender() {
-		return sender;
-	}
+    public String getContent() { return content; }
+    public void setContent(String content) { this.content = content; }
 
-	public void setSender(String sender) {
-		this.sender = sender;
-	}
-
-	public String getReceiver() {
-		return receiver;
-	}
-
-	public void setReceiver(String receiver) {
-		this.receiver = receiver;
-	}
-
-	public String getContent() {
-		return content;
-	}
-
-	public void setContent(String content) {
-		this.content = content;
-	}
-
-	public LocalDateTime getTimestamp() {
-		return timestamp;
-	}
-
-	public void setTimestamp(LocalDateTime timestamp) {
-		this.timestamp = timestamp;
-	}
-
-    
+    public LocalDateTime getTimestamp() { return timestamp; }
+    public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
 }

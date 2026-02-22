@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Select User</title>
+</head>
+<body>
+
+<h2>Select someone to chat</h2>
+<ul id="userList"></ul>
+
+<script>
+fetch("/api/users")
+.then(res => res.json())
+.then(users => {
+
+    const list = document.getElementById("userList");
+
+    users.forEach(user => {
+
+        const li = document.createElement("li");
+
+        li.innerHTML = `
+            <button onclick="openChat('${user.username}')">
+                ${user.username}
+            </button>
+        `;
+
+        list.appendChild(li);
+    });
+});
+
+function openChat(username){
+    window.location.href = "message.html?receiver=" + username;
+}
+</script>
+
+</body>
+</html>

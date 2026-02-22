@@ -23,19 +23,18 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
         @Param("u1") String u1,
         @Param("u2") String u2
     );
-    
+
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query("""
-    		UPDATE Message m
-    		SET m.seen = true
-    		WHERE m.sender = :sender
-    		AND m.receiver = :receiver
-    		AND m.seen = false
-    		""")
+        UPDATE Message m
+        SET m.seen = true
+        WHERE m.sender = :sender
+        AND m.receiver = :receiver
+        AND m.seen = false
+    """)
     void markAsSeen(
-            @Param("sender") String sender,
-            @Param("receiver") String receiver
-        );
-
+        @Param("sender") String sender,
+        @Param("receiver") String receiver
+    );
 }

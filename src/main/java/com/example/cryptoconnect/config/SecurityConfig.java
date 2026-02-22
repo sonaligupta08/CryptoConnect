@@ -70,7 +70,8 @@ public class SecurityConfig {
                         "/profile.html",
                         "/about.html",
                         "/message.html",
-                        "/profilesetup.html"
+                        "/profilesetup.html",
+                        "/select-user.html"
                 ).permitAll()
 
               

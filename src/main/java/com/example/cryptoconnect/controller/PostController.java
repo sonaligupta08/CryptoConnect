@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.cryptoconnect.entity.Post;
 import com.example.cryptoconnect.repository.PostRepository;
 import com.example.cryptoconnect.service.BlockchainService;
+import com.example.cryptoconnect.service.NotificationService;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -27,6 +28,9 @@ public class PostController {
 
     @Autowired
     private BlockchainService blockchainService;
+    
+    @Autowired
+    private NotificationService notificationService;
 
     // creating post
     @PostMapping("/create")
@@ -79,9 +83,17 @@ public class PostController {
         post.setImageUrl(null);
 
         postRepository.save(post);
+        
 
-        return ResponseEntity.ok("Post deleted successfully");
+     // 🔥 SEND REALTIME NOTIFICATION
+     notificationService.notifyDelete(postId, post.getUsername());
+
+     return ResponseEntity.ok("Post deleted successfully");
+
+        
     }
+    
+    
 
     // get all posts
     @GetMapping("/all")

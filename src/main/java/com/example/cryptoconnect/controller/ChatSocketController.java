@@ -10,43 +10,48 @@ import org.springframework.stereotype.Controller;
 import com.example.cryptoconnect.entity.ChatMessage;
 import com.example.cryptoconnect.entity.Message;
 import com.example.cryptoconnect.repository.MessageRepository;
+import com.example.cryptoconnect.repository.UserRepository;
 
 @Controller
 public class ChatSocketController {
 
-    @Autowired
-    private SimpMessagingTemplate messagingTemplate;
+	@Autowired
+	private SimpMessagingTemplate messagingTemplate;
 
-    @Autowired
-    private MessageRepository messageRepo;
+	@Autowired
+	private MessageRepository messageRepo;
+	
+	@Autowired
+	private UserRepository userRepository;
 
-    @MessageMapping("/chat.send")
-    public void send(ChatMessage chat) {
+	@MessageMapping("/chat.send")
+	public void send(ChatMessage chat) {
 
-        Message m = new Message();
-        m.setSender(chat.getSender());
-        m.setReceiver(chat.getReceiver());
-        m.setContent(chat.getContent());
-        m.setTimestamp(LocalDateTime.now());
-        m.setSeen(false);
+	    String sender = chat.getSender().trim().toLowerCase();
+	    String receiver = chat.getReceiver().trim().toLowerCase();
 
-        // save first
-        Message saved = messageRepo.save(m);
+	    if (!userRepository.existsByUsername(receiver)) {
 
-        // send saved message to receiver
-        messagingTemplate.convertAndSendToUser(
-            chat.getReceiver(),
-            "/queue/messages",
-            saved
-        );
+	        messagingTemplate.convertAndSendToUser(
+	            sender,
+	            "/queue/errors",
+	            "User does not exist"
+	        );
 
-        // send to sender (for instant UI)
-        messagingTemplate.convertAndSendToUser(
-            chat.getSender(),
-            "/queue/messages",
-            saved
-        );
-    }
+	        return;
+	    }
+
+	    Message m = new Message();
+	    m.setSender(sender);
+	    m.setReceiver(receiver);
+	    m.setContent(chat.getContent());
+	    m.setTimestamp(LocalDateTime.now());
+	    m.setSeen(false);
+
+	    Message saved = messageRepo.save(m);
+
+	    messagingTemplate.convertAndSendToUser(receiver, "/queue/messages", saved);
+	    messagingTemplate.convertAndSendToUser(sender, "/queue/messages", saved);
+	}
 
 }
-

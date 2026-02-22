@@ -5,10 +5,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +28,16 @@ public class UserController {
 
 	@Autowired
 	private UserRepository userRepository;
+	
+	@GetMapping("/users")
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+	@GetMapping("/chat-users/{username}")
+	public List<User> getUsersForChat(@PathVariable String username) {
+	    return userRepository.findByUsernameNot(username);
+	}
 
 	@PutMapping("/profile/{id}")
 	public ResponseEntity<User> updateProfile(
@@ -65,4 +77,6 @@ public class UserController {
 			throw new RuntimeException("Image upload failed");
 		}
 	}
+	
+	
 }
