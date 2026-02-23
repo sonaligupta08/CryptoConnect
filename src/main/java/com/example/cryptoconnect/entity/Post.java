@@ -16,6 +16,17 @@ public class Post {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	public String getBlockchainTxHash() {
+		return blockchainTxHash;
+	}
+
+	public void setBlockchainTxHash(String blockchainTxHash) {
+		this.blockchainTxHash = blockchainTxHash;
+	}
+
+	@Column(length = 100)
+	private String blockchainTxHash;
+	
 	private Long userId;  //owner id
 	private String username; //owner name
 	private String content;

@@ -62,20 +62,20 @@ public class UserController {
 	}
 
 	private String saveImage(MultipartFile file) {
-		try {
-			String uploadDir = "src/main/resources/static/uploads/";
-			Files.createDirectories(Paths.get(uploadDir));
+	    try {
+	        String uploadDir = "uploads/profile/";
+	        Files.createDirectories(Paths.get(uploadDir));
 
-			String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-			Path filePath = Paths.get(uploadDir + fileName);
+	        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+	        Path filePath = Paths.get(uploadDir + fileName);
 
-			Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+	        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-			return "/uploads/" + fileName;
+	        return "uploads/profile/" + fileName;
 
-		} catch (IOException e) {
-			throw new RuntimeException("Image upload failed");
-		}
+	    } catch (IOException e) {
+	        throw new RuntimeException("Image upload failed");
+	    }
 	}
 	
 	

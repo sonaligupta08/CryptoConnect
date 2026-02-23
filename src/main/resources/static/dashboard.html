@@ -530,11 +530,15 @@ body {
 				  formData.append("image", imageInput.files[0]);
 				}
 
+				const token = localStorage.getItem("token"); 
+
 				await fetch("http://localhost:8080/api/posts/create", {
 				  method: "POST",
+				  headers: {
+				    "Authorization": "Bearer " + token
+				  },
 				  body: formData
 				});
-
 
 				document.getElementById("input").value = "";
 				document.getElementById("image-preview").innerHTML = "";

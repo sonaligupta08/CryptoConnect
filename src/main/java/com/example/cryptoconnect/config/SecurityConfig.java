@@ -84,7 +84,7 @@ public class SecurityConfig {
                 ).permitAll()
 
                 
-                .requestMatchers("/api/chat/**").permitAll()
+                .anyRequest().permitAll()  
             );
 
         return http.build();

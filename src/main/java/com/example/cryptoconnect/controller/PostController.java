@@ -47,17 +47,28 @@ public class PostController {
         post.setUserId(userId);
         post.setUsername(username);
         post.setContent(content);
-        post.setPostHash(postHash);
         post.setWalletAddress(walletAddress);
+        post.setPostHash(postHash);
         post.setDeleted(false);
 
         if (image != null && !image.isEmpty()) {
             post.setImageUrl(image.getOriginalFilename());
         }
 
-        return postRepository.save(post);
-    }
+        // save first
+        Post savedPost = postRepository.save(post);
 
+        // blockchain attempt (non-blocking)
+        try {
+            String txHash = blockchainService.savePostHashToBlockchain(postHash);
+            savedPost.setBlockchainTxHash(txHash);
+            postRepository.save(savedPost);
+        } catch (Exception e) {
+            System.out.println("Blockchain failed but post saved: " + e.getMessage());
+        }
+
+        return savedPost;
+    }
     // get post of a user
     @GetMapping("/user/{userId}")
     public List<Post> getPostByUser(@PathVariable Long userId) {
