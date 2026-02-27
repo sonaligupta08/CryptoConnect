@@ -1,20 +1,21 @@
 package com.example.cryptoconnect.controller;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.cryptoconnect.entity.Post;
+import com.example.cryptoconnect.entity.User;
 import com.example.cryptoconnect.repository.PostRepository;
+import com.example.cryptoconnect.repository.UserRepository;
 import com.example.cryptoconnect.service.BlockchainService;
 import com.example.cryptoconnect.service.NotificationService;
 
@@ -27,86 +28,121 @@ public class PostController {
     private PostRepository postRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private BlockchainService blockchainService;
-    
+
     @Autowired
     private NotificationService notificationService;
 
-    // creating post
+    // ================================
+    // CREATE POST
+    // ================================
     @PostMapping("/create")
-    public Post createPost(
+    public ResponseEntity<?> createPost(
             @RequestParam Long userId,
-            @RequestParam String username,
             @RequestParam String content,
             @RequestParam(required = false) String postHash,
             @RequestParam(required = false) String walletAddress,
             @RequestParam(required = false) MultipartFile image
     ) {
 
+        if (content == null || content.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Post content required");
+        }
+
+        // get real user from DB
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         Post post = new Post();
         post.setUserId(userId);
-        post.setUsername(username);
+        post.setUsername(user.getUsername()); // SAFE SOURCE
         post.setContent(content);
         post.setWalletAddress(walletAddress);
         post.setPostHash(postHash);
         post.setDeleted(false);
 
+        // save image if exists
         if (image != null && !image.isEmpty()) {
-            post.setImageUrl(image.getOriginalFilename());
+            String imageUrl = saveImage(image);
+            post.setImageUrl(imageUrl);
         }
 
-        // save first
+        // save post first
         Post savedPost = postRepository.save(post);
 
-        // blockchain attempt (non-blocking)
+        // blockchain (non-blocking)
         try {
-            String txHash = blockchainService.savePostHashToBlockchain(postHash);
-            savedPost.setBlockchainTxHash(txHash);
-            postRepository.save(savedPost);
+            if (postHash != null && !postHash.isBlank()) {
+                String txHash = blockchainService.savePostHashToBlockchain(postHash);
+                savedPost.setBlockchainTxHash(txHash);
+                postRepository.save(savedPost);
+            }
         } catch (Exception e) {
             System.out.println("Blockchain failed but post saved: " + e.getMessage());
         }
 
-        return savedPost;
+        return ResponseEntity.ok(savedPost);
     }
-    // get post of a user
+
+    // ================================
+    // SAVE IMAGE TO SERVER
+    // ================================
+    private String saveImage(MultipartFile file) {
+        try {
+            String uploadDir = "uploads/posts/";
+            Files.createDirectories(Paths.get(uploadDir));
+
+            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+            Path filePath = Paths.get(uploadDir + fileName);
+
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            return uploadDir + fileName;
+
+        } catch (IOException e) {
+            throw new RuntimeException("Post image upload failed");
+        }
+    }
+
+    // ================================
+    // USER POSTS
+    // ================================
     @GetMapping("/user/{userId}")
     public List<Post> getPostByUser(@PathVariable Long userId) {
         return postRepository.findByUserId(userId);
     }
 
-    // delete post
+    // ================================
+    // DELETE POST
+    // ================================
     @PostMapping("/{postId}/delete/{userId}")
     public ResponseEntity<?> deletePost(@PathVariable Long postId, @PathVariable Long userId) {
 
         Post post = postRepository.findById(postId).orElse(null);
 
-        if (post == null) {
+        if (post == null)
             return ResponseEntity.notFound().build();
-        }
 
-        if (!post.getUserId().equals(userId)) {
+        if (!post.getUserId().equals(userId))
             return ResponseEntity.status(403).body("Not allowed");
-        }
 
         post.setDeleted(true);
         post.setContent("This post was deleted");
         post.setImageUrl(null);
 
         postRepository.save(post);
-        
 
-     // 🔥 SEND REALTIME NOTIFICATION
-     notificationService.notifyDelete(postId, post.getUsername());
+        notificationService.notifyDelete(postId, post.getUsername());
 
-     return ResponseEntity.ok("Post deleted successfully");
-
-        
+        return ResponseEntity.ok("Post deleted successfully");
     }
-    
-    
 
-    // get all posts
+    // ================================
+    // ALL POSTS
+    // ================================
     @GetMapping("/all")
     public List<Post> getAllPosts() {
         return postRepository.findAllByOrderByCreatedAtDesc();

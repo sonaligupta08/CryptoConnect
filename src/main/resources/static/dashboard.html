@@ -282,6 +282,75 @@ body {
 		width: 100%;
 	}
 }
+
+.right-panel {
+	position: relative;
+	padding: 0;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+}
+
+.connect-img {
+	position: relative;
+}
+
+.connect-img img {
+	width: 100%;
+	height: 260px;
+	object-fit: cover;
+	filter: brightness(0.55);
+}
+
+.overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.9));
+}
+
+.welcome-box {
+	padding: 25px;
+	text-align: left;
+}
+
+.welcome-title {
+	color: #aaa;
+	font-weight: 400;
+	margin-bottom: 5px;
+}
+
+.brand-title {
+	font-size: 2.3rem;
+	font-weight: 700;
+	background: linear-gradient(90deg, #1d9bf0, #00f5ff);
+	-webkit-background-clip: text;
+	color: transparent;
+	margin-bottom: 15px;
+}
+
+.welcome-desc {
+	color: #cfcfcf;
+	font-size: 0.95rem;
+	line-height: 1.5;
+	margin-bottom: 20px;
+}
+
+.feature-list {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	font-size: 0.9rem;
+	color: #e5e5e5;
+}
+
+.feature-list i {
+	color: #1d9bf0;
+	margin-right: 8px;
+}
 </style>
 </head>
 
@@ -353,12 +422,34 @@ body {
 			</div>
 
 			<!-- Right Side -->
-			<div class="col-md-3 d-none d-md-block content-2">
+			<div class="col-md-3 d-none d-md-block content-2 right-panel">
+
 				<div class="connect-img">
 					<img src="connect.jpg" alt="connect">
+					<div class="overlay"></div>
 				</div>
-				<h1 class="text">Welcome To</h1>
-				<h1 class="text">CryptoConnect!!</h1>
+
+				<div class="welcome-box">
+					<h2 class="welcome-title">Welcome to</h2>
+					<h1 class="brand-title">CryptoConnect</h1>
+
+					<p class="welcome-desc">Connect with crypto enthusiasts, share
+						insights, and explore blockchain powered conversations.</p>
+
+					<div class="feature-list">
+						<div>
+							<i class="bx bx-check-circle"></i> Secure blockchain posts
+						</div>
+						<div>
+							<i class="bx bx-check-circle"></i> Real-time chats
+						</div>
+						<div>
+							<i class="bx bx-check-circle"></i> Wallet based identity
+						</div>
+					</div>
+
+				</div>
+
 			</div>
 
 		</div>
@@ -521,7 +612,6 @@ body {
 			try {
 				const formData = new FormData();
 				formData.append("userId", currentUser.id);
-				formData.append("username", currentUser.username);
 				formData.append("content", content);
 				formData.append("postHash", postHash);
 				formData.append("walletAddress", currentUser.walletAddress || "");

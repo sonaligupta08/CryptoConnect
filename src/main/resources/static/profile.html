@@ -18,22 +18,18 @@ body {
 	color: #fff;
 	font-family: "Poppins", sans-serif;
 }
-
 .outer {
 	height: 100vh;
 }
-
 .sidebar {
 	background: #000;
 	border-right: 1px solid #2f3336;
 	padding: 2rem 1.5rem;
 }
-
 .sidebar ul {
 	list-style: none;
 	padding: 0;
 }
-
 .sidebar ul li {
 	display: flex;
 	gap: 10px;
@@ -41,7 +37,6 @@ body {
 	cursor: pointer;
 	font-size: 1.1rem;
 }
-
 .sidebar ul li:hover {
 	background: #16181c;
 	border-radius: 20px;
@@ -115,7 +110,6 @@ body {
 </head>
 
 <body>
-
 	<div class="container-fluid">
 		<div class="row outer">
 
@@ -158,7 +152,6 @@ body {
 			<div class="col-md-3 d-none d-md-block"></div>
 		</div>
 	</div>
-
 	<script>
 let allPosts = [];
 let currentTab = "tweets";
@@ -175,8 +168,6 @@ async function loadUserPosts() {
 
 	document.getElementById("profileName").innerText = currentUser.username;
 	document.getElementById("displayBio").innerText = currentUser.bio || "No bio yet";
-
-	// ✅ FIXED profile image path handling
 	document.getElementById("profileImg").src =
 		currentUser.profileImage
 		? "http://localhost:8080/" + currentUser.profileImage
@@ -238,7 +229,6 @@ function renderPosts() {
 
 		container.appendChild(div);
 
-		// ✅ LOAD LIKE COUNT
 		loadLikeCount(post.id);
 	});
 }
@@ -320,7 +310,6 @@ const profileUser = urlParams.get("user");
 
 const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
 
-//hide message button if viewing own profile
 if (profileUser === currentUser.username) {
  document.getElementById("messageBtn").style.display = "none";
 }

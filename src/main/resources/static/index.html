@@ -27,7 +27,6 @@ body {
 	font-family: "Poppins", sans-serif;
 }
 
-/* ---------- TOP BAR ---------- */
 .top-bar {
 	background-color: #0b4d99;
 	padding: 10px;
@@ -35,7 +34,6 @@ body {
 	font-size: 1.2rem;
 }
 
-/* ---------- NAVBAR ---------- */
 #crypto {
 	color: #00bfff;
 	text-shadow: 0 0 8px #00bfff;
@@ -66,7 +64,6 @@ body {
 	color: #00bfff !important;
 }
 
-/* ---------- HERO SECTION ---------- */
 #text {
 	min-height: 100vh;
 	background-image: url("community.jpeg");
@@ -126,7 +123,6 @@ body {
 	box-shadow: 0 0 12px #00bfff;
 }
 
-/* ---------- FEATURES ---------- */
 .feature-box {
 	background: #050b14;
 	padding: 25px;
@@ -141,7 +137,6 @@ body {
 	box-shadow: 0 0 35px rgba(0, 191, 255, 0.4);
 }
 
-/* ---------- RESPONSIVE ---------- */
 @media ( max-width : 576px) {
 	.top-bar {
 		font-size: 0.8rem;
@@ -157,7 +152,6 @@ body {
 	}
 }
 
-/* MOBILE NAVBAR */
 @media ( max-width : 576px) {
 	.navbar {
 		padding-top: 4px !important;
@@ -176,7 +170,62 @@ body {
 	}
 }
 
-/* ---------- FOOTER ---------- */
+.section-title {
+	color: #00bfff;
+	font-weight: 700;
+	margin-bottom: 20px;
+	text-align: center;
+}
+
+.stat-box {
+	background: #050b14;
+	border-radius: 12px;
+	padding: 20px;
+	text-align: center;
+	box-shadow: 0 0 20px rgba(0, 191, 255, 0.1);
+	transition: .3s;
+}
+
+.stat-box:hover {
+	transform: translateY(-5px);
+	box-shadow: 0 0 30px rgba(0, 191, 255, 0.35);
+}
+
+.step-card {
+	background: #050b14;
+	padding: 25px;
+	border-radius: 12px;
+	height: 100%;
+}
+
+.testimonial {
+	background: #050b14;
+	padding: 20px;
+	border-radius: 12px;
+	font-style: italic;
+}
+
+.faq .accordion-button {
+	background: #050b14;
+	color: white;
+}
+
+.faq .accordion-body {
+	background: #000;
+	color: #ccc;
+}
+
+.cta-section {
+	background: linear-gradient(135deg, #001a33, #000);
+	padding: 60px 20px;
+	text-align: center;
+}
+
+.cta-section h2 {
+	color: #00bfff;
+	font-weight: 700;
+}
+
 .footer {
 	background: #050b14;
 	border-top: 1px solid rgba(0, 191, 255, 0.2);
@@ -218,9 +267,7 @@ body {
 }
 </style>
 </head>
-
 <body>
-
 	<!-- TOP BAR -->
 	<div class="top-bar text-white">Join Our Crypto Community</div>
 
@@ -286,6 +333,68 @@ body {
 		</div>
 	</section>
 
+
+	<section class="container my-5">
+		<h2 class="section-title">Market Highlights</h2>
+
+		<div class="row g-4">
+
+			<div class="col-md-4">
+				<div class="stat-box">
+					<h4>Bitcoin</h4>
+					<p>$64,210</p>
+					<p style="color: lime;">+2.4%</p>
+				</div>
+			</div>
+
+			<div class="col-md-4">
+				<div class="stat-box">
+					<h4>Ethereum</h4>
+					<p>$3,120</p>
+					<p style="color: lime;">+1.2%</p>
+				</div>
+			</div>
+
+			<div class="col-md-4">
+				<div class="stat-box">
+					<h4>Global Market Cap</h4>
+					<p>$2.41 Trillion</p>
+					<p style="color: red;">-0.4%</p>
+				</div>
+			</div>
+
+		</div>
+	</section>
+
+	<section class="container my-5">
+		<h2 class="section-title">How It Works</h2>
+
+		<div class="row g-4 text-center">
+
+			<div class="col-md-4">
+				<div class="step-card">
+					<h5>1. Create Account</h5>
+					<p>Sign up and join the crypto discussion network.</p>
+				</div>
+			</div>
+
+			<div class="col-md-4">
+				<div class="step-card">
+					<h5>2. Share Insights</h5>
+					<p>Post updates, charts, predictions and news.</p>
+				</div>
+			</div>
+
+			<div class="col-md-4">
+				<div class="step-card">
+					<h5>3. Grow Together</h5>
+					<p>Learn from traders and build knowledge.</p>
+				</div>
+			</div>
+
+		</div>
+	</section>
+
 	<!-- FOOTER -->
 	<footer class="footer">
 		<h5>CryptoConnect</h5>
@@ -299,7 +408,6 @@ body {
 		<div class="footer-bottom">© 2025 CryptoConnect. All rights
 			reserved.</div>
 	</footer>
-
 
 	<!-- Bootstrap JS -->
 	<script

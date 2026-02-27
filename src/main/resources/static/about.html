@@ -2,81 +2,177 @@
 <html lang="en">
 
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-	<title>About us</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us</title>
 
-	<style>
-		body {
-			background-color: #000;
-			color: #fff;
-			font-family: "Poppins", sans-serif;
-			margin: 0;
-			padding: 0;
-		}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
-		.card {
-			background-color: #0B4D99;
-			width: 60%;
-			margin: 5rem auto;
-			padding: 2.5rem;
-			border-radius: 20px;
-			text-align: center;
-			box-shadow: 0px 0px 15px rgba(0, 140, 255, 0.4);
-		}
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Poppins", sans-serif;
+            background: radial-gradient(circle at top, #001a33, #000 60%);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
 
-		.about {
-			font-size: 35px;
-			font-weight: 600;
-			color: #fff;
-			margin-bottom: 1rem;
-		}
+        .container {
+            width: 100%;
+            max-width: 900px;
+            padding: 20px;
+        }
 
-		.card p {
-			font-size: 1rem;
-			line-height: 1.6;
-			color: #e5e5e5;
-		}
+        .back-btn {
+            background: white;
+            color: black;
+            padding: 8px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 20px;
+            transition: .25s;
+        }
 
-		.back-btn {
-			background-color: #fff;
-			color: #000;
-			padding: 8px 18px;
-			border-radius: 8px;
-			text-decoration: none;
-			font-weight: 600;
-			display: inline-block;
-			margin-bottom: 1.5rem;
-		}
+        .back-btn:hover {
+            background: #ddd;
+            transform: translateY(-1px);
+        }
 
-		.back-btn:hover {
-			background-color: #ddd;
-		}
-	</style>
+        .card {
+            background: #0B4D99;
+            padding: 3rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 0 35px rgba(0, 191, 255, .35);
+            border: 1px solid rgba(0, 191, 255, .3);
+            backdrop-filter: blur(12px);
+            animation: fadeUp 1.2s ease forwards;
+            opacity: 0;
+            transform: translateY(40px);
+        }
+
+        @keyframes fadeUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .about {
+            font-size: 38px;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: .5px;
+        }
+
+        .subtitle {
+            color: #cce6ff;
+            margin-bottom: 25px;
+            font-size: 1.05rem;
+        }
+
+        .card p {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: #e5e5e5;
+            margin-bottom: 14px;
+        }
+
+        .features {
+            margin-top: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 18px;
+        }
+
+        .feature {
+            background: rgba(255, 255, 255, .05);
+            padding: 18px;
+            border-radius: 12px;
+            transition: .25s;
+        }
+
+        .feature:hover {
+            background: rgba(255, 255, 255, .08);
+            transform: translateY(-3px);
+        }
+
+        .feature i {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: #00bfff;
+        }
+
+        .footer-note {
+            margin-top: 30px;
+            font-size: .95rem;
+            color: #cce6ff;
+            opacity: .9;
+        }
+    </style>
 </head>
 
 <body>
-	<div class="container">
-		<a href="index.html" class="back-btn">
-			<i class="fa-solid fa-arrow-left"></i> Go Back
-		</a>
 
-		<div class="card">
-			<h2 class="about">About Us</h2>
-			<p>CryptoConnect is a modern platform built for crypto enthusiasts who want to learn, share, and grow
-				together.
-			</p>
-			<p>Users can post insights, exchange ideas, and create mini crypto communities of up to five members.</p>
-			<p>Built on blockchain technology, CryptoConnect ensures that your data is secure, transparent, and
-				tamper-proof.</p>
-			<p>Our mission is to provide a safe and engaging space for everyone — from beginners to experts — to explore
-				the
-				world of cryptocurrency with confidence.</p>
-			<p>Join CryptoConnect and be part of a future shaped by community and decentralization.</p>
-		</div>
-	</div>
+    <div class="container">
 
+        <a href="index.html" class="back-btn">
+            <i class="fa-solid fa-arrow-left"></i> Go Back
+        </a>
+
+        <div class="card">
+
+            <div class="about">About CryptoConnect</div>
+            <div class="subtitle">A modern space for crypto learning, collaboration and growth</div>
+
+            <p>
+                CryptoConnect is a community-driven platform built for people who want to understand, discuss and
+                participate in the evolving world of digital assets.
+            </p>
+
+            <p>
+                Members can share insights, create focused discussion groups and collaborate
+                designed for meaningful interaction rather than noise.
+            </p>
+
+            <p>
+                Our platform is designed with security, transparency and reliability at its core — giving users
+                confidence while exploring blockchain technologies.
+            </p>
+
+            <div class="features">
+
+
+                <div class="feature">
+                    <i class="fa-solid fa-lock"></i>
+                    <div>Secure Platform</div>
+                </div>
+
+                <div class="feature">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <div>Market Insights</div>
+                </div>
+
+                <div class="feature">
+                    <i class="fa-solid fa-lightbulb"></i>
+                    <div>Knowledge Sharing</div>
+                </div>
+
+            </div>
+
+            <div class="footer-note">
+                Built for beginners, learners and experienced crypto enthusiasts alike.
+            </div>
+
+        </div>
+
+    </div>
 
 </body>
 

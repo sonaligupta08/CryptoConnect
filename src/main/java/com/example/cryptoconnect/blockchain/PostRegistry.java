@@ -38,7 +38,6 @@ public class PostRegistry extends Contract {
         return new PostRegistry(contractAddress, web3j, credentials, gasProvider);
     }
 
-    // WRITE TRANSACTION
     public RemoteFunctionCall<TransactionReceipt> storePost(String hash) {
 
         final Function function = new Function(
@@ -49,8 +48,6 @@ public class PostRegistry extends Contract {
 
         return executeRemoteCallTransaction(function);
     }
-
-    // READ (VIEW) TRANSACTION
     public RemoteFunctionCall<Tuple2<Address, Uint256>> verifyPost(String hash) {
 
         final Function function = new Function(

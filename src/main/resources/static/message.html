@@ -13,8 +13,6 @@ body.dark {
     color: #ffffff;
     font-family: Arial, sans-serif;
 }
-
-/* USER LIST */
 #userListPanel {
     width: 400px;
     margin: 40px auto;
@@ -113,20 +111,16 @@ const currentUser = JSON.parse(localStorage.getItem("currentUser") || {});
 const urlParams = new URLSearchParams(window.location.search);
 const receiverUser = urlParams.get("receiver");
 
-/* LOGIN CHECK */
 if (!currentUser.username) {
     alert("Please login first");
     window.location.href = "login.html";
 }
 
-/* PAGE MODE SWITCH */
 if (!receiverUser) {
     showUserList();
 } else {
     startChat();
 }
-
-/* ================= USER LIST ================= */
 
 function showUserList(){
 
@@ -157,8 +151,6 @@ function showUserList(){
 function openChat(username){
     window.location.href = "message.html?receiver=" + username;
 }
-
-/* ================= CHAT ================= */
 
 function startChat(){
 
@@ -207,7 +199,6 @@ function connectSocket() {
 
     });
 }
-
 async function loadChat(receiver) {
 
     const res = await fetch(
@@ -249,16 +240,13 @@ function sendMessage() {
     stompClient.send("/app/chat.send", {}, JSON.stringify(message));
     input.value = "";
 }
-
 const displayedMessages = new Set();
-
 function showMessage(sender, text, isSender, id = null) {
 
     if (id && displayedMessages.has(id)) return;
     if (id) displayedMessages.add(id);
 
     const box = document.getElementById("message-box");
-
     const msg = document.createElement("div");
     msg.innerHTML = `<b>${sender}:</b> ${text}`;
     msg.style.padding = "8px";
@@ -266,12 +254,9 @@ function showMessage(sender, text, isSender, id = null) {
     msg.style.borderRadius = "5px";
     msg.style.background = isSender ? "#00bcd4" : "#333";
     msg.style.color = isSender ? "#000" : "#fff";
-
     box.appendChild(msg);
     box.scrollTop = box.scrollHeight;
 }
-
 </script>
-
 </body>
 </html>
