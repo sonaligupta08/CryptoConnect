@@ -45,7 +45,8 @@ public class PostController {
             @RequestParam String content,
             @RequestParam(required = false) String postHash,
             @RequestParam(required = false) String walletAddress,
-            @RequestParam(required = false) MultipartFile image
+            @RequestParam(required = false) MultipartFile image,
+            @RequestParam(required = false) Long communityId
     ) {
 
         if (content == null || content.trim().isEmpty()) {
@@ -63,6 +64,7 @@ public class PostController {
         post.setWalletAddress(walletAddress);
         post.setPostHash(postHash);
         post.setDeleted(false);
+        post.setCommunityId(communityId);
 
         // save image if exists
         if (image != null && !image.isEmpty()) {
@@ -115,6 +117,10 @@ public class PostController {
         return postRepository.findByUserId(userId);
     }
 
+    @GetMapping("/community/{communityId}")
+    public List<Post> getCommunityPosts(@PathVariable Long communityId) {
+        return postRepository.findByCommunityIdOrderByCreatedAtDesc(communityId);
+    }
     // ================================
     // DELETE POST
     // ================================

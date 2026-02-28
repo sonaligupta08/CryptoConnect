@@ -36,6 +36,16 @@ public class Post {
 	private String walletAddress;
 	private boolean deleted = false;
 	
+	private Long communityId;
+	
+	public Long getCommunityId() {
+		return communityId;
+	}
+
+	public void setCommunityId(Long communityId) {
+		this.communityId = communityId;
+	}
+
 	public boolean isDeleted() {
 		return deleted;
 	}

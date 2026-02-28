@@ -375,28 +375,27 @@ body {
 					<ul>
 						<li><i class='bx bx-home'></i> Home</li>
 						<li><i class='bx bx-bell'></i> Notification</li>
+
 						<li onclick="window.location.href='message.html'"><i
 							class='bx bx-message'></i> Messages</li>
 
+						<li onclick="window.location.href='community.html'"><i
+							class='bx bx-group'></i> Communities</li>
 
 						<li onclick="window.location.href='profile.html'"><i
 							class='bx bx-user'></i> Profile</li>
 					</ul>
 				</div>
-
-				<div class="profile-section">
-					<div class="profile-pic">?</div>
-					<div>
-						<p class="username">Guest</p>
-						<p class="handle">@guest_user</p>
-					</div>
-					<i class='bx bx-dots-horizontal-rounded'></i>
-				</div>
+				<hr>
 			</div>
 
 			<!-- Main Content -->
 			<div class="col-12 col-md-6 content">
-				<h5>For You</h5>
+				<h5 id="feedTitle">For You</h5>
+
+				<button onclick="exitCommunity()"
+					style="margin-bottom: 10px; background: #1d9bf0; border: none; color: white; padding: 6px 12px; border-radius: 20px;">
+					Leave Community View</button>
 
 				<div class="divide">
 					<div class="profile-section">
@@ -476,6 +475,9 @@ body {
 	<script>
 		// Get logged-in user from localStorage
 		const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+		const USER_ID = currentUser.id;
+		
+		const API = "http://localhost:8080/api";
 		
 		// Wallet Connect Elements
 		const walletBtn = document.getElementById("connectWalletBtn");
@@ -511,7 +513,7 @@ body {
 		document.querySelectorAll(".handle").forEach(el => el.innerText = "@" + displayName);
 		
 		const API_BASE = "http://localhost:8080/";
-
+		
 		document.querySelectorAll(".profile-pic").forEach(el => {
 		  if (currentUser.profileImage) {
 		    el.innerHTML = `
@@ -589,6 +591,7 @@ body {
 				console.error("Failed to load posts", err);
 			}
 		}
+		
 
 		// Like toggle function
 		async function toggleLike(postId) {
@@ -637,6 +640,10 @@ body {
 				formData.append("content", content);
 				formData.append("postHash", postHash);
 				formData.append("walletAddress", currentUser.walletAddress || "");
+				
+				if (selectedCommunityId) {
+				    formData.append("communityId", selectedCommunityId);
+				}
 
 				if (imageInput.files[0]) {
 				  formData.append("image", imageInput.files[0]);
@@ -714,6 +721,35 @@ body {
 		    });
 
 		    loadPosts();
+		}
+		
+		let selectedCommunityId = null;
+
+		const savedCommunity = localStorage.getItem("selectedCommunityId");
+		if(savedCommunity){
+		    selectedCommunityId = savedCommunity;
+
+		    // show community title
+		    loadCommunityTitle(savedCommunity);
+		}
+		
+		async function loadCommunityTitle(id){
+
+		    const res = await fetch(`${API}/communities/all`);
+		    if(!res.ok) return;
+
+		    const list = await res.json();
+		    const community = list.find(c => c.id == id);
+
+		    if(community){
+		        document.getElementById("feedTitle").innerText =
+		            "Community: " + community.name;
+		    }
+		}
+		
+		function exitCommunity(){
+		    localStorage.removeItem("selectedCommunityId");
+		    location.reload();
 		}
 
 	</script>
