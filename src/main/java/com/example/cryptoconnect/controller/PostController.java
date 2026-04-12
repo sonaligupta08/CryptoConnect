@@ -24,133 +24,92 @@ import com.example.cryptoconnect.service.NotificationService;
 @RequestMapping("/api/posts")
 public class PostController {
 
-    @Autowired
-    private PostRepository postRepository;
+	@Autowired
+	private PostRepository postRepository;
+	@Autowired
+	private UserRepository userRepository;
+	@Autowired
+	private BlockchainService blockchainService;
+	@Autowired
+	private NotificationService notificationService;
 
-    @Autowired
-    private UserRepository userRepository;
+	@PostMapping("/create")
+	public ResponseEntity<?> createPost(@RequestParam Long userId, @RequestParam String content,
+			@RequestParam(required = false) String postHash, @RequestParam(required = false) String walletAddress,
+			@RequestParam(required = false) MultipartFile image) {
+		
+		if (content.length() > 500) {
+		    return ResponseEntity.badRequest().body("Content too long");
+		}
+		
+		if (content == null || content.trim().isEmpty()) {
+			return ResponseEntity.badRequest().body("Post content required");
+		}
+		User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+		Post post = new Post();
+		post.setUserId(userId);
+		post.setUsername(user.getUsername());
+		post.setWalletAddress(walletAddress);
+		post.setPostHash(postHash);
+		post.setDeleted(false);
+		post.setContent(content);
 
-    @Autowired
-    private BlockchainService blockchainService;
+		// save image if exists
+		if (image != null && !image.isEmpty()) {
+			String imageUrl = saveImage(image);
+			post.setImageUrl(imageUrl);
+		}
+		// save post first
+		Post savedPost = postRepository.save(post);
+		try {
+			if (postHash != null && !postHash.isBlank()) {
+				String txHash = blockchainService.savePostHashToBlockchain(postHash);
+				savedPost.setBlockchainTxHash(txHash);
+				postRepository.save(savedPost);
+			}
+		} catch (Exception e) {
+			System.out.println("Blockchain failed but post saved: " + e.getMessage());
+		}
+		return ResponseEntity.ok(savedPost);
+	}
 
-    @Autowired
-    private NotificationService notificationService;
+	// ================================ // SAVE IMAGE TO SERVER //
+	// ================================
+	private String saveImage(MultipartFile file) {
+		try {
+			String uploadDir = "uploads/posts/";
+			Files.createDirectories(Paths.get(uploadDir));
+			String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+			Path filePath = Paths.get(uploadDir + fileName);
+			Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+			return uploadDir + fileName;
+		} catch (IOException e) {
+			throw new RuntimeException("Post image upload failed");
+		}
+	}
 
-    // ================================
-    // CREATE POST
-    // ================================
-    @PostMapping("/create")
-    public ResponseEntity<?> createPost(
-            @RequestParam Long userId,
-            @RequestParam String content,
-            @RequestParam(required = false) String postHash,
-            @RequestParam(required = false) String walletAddress,
-            @RequestParam(required = false) MultipartFile image,
-            @RequestParam(required = false) Long communityId
-    ) {
+	@GetMapping("/user/{userId}")
+	public List<Post> getPostByUser(@PathVariable Long userId) {
+		return postRepository.findByUserId(userId);
+	}
 
-        if (content == null || content.trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("Post content required");
-        }
+	@PostMapping("/{postId}/delete/{userId}")
+	public ResponseEntity<?> deletePost(@PathVariable Long postId, @PathVariable Long userId) {
+		Post post = postRepository.findById(postId).orElse(null);
+		if (post == null)
+			return ResponseEntity.notFound().build();
+		if (!post.getUserId().equals(userId))
+			return ResponseEntity.status(403).body("Not allowed");
+		post.setDeleted(true);
+		post.setContent("This post was deleted");
+		post.setImageUrl(null);
+		postRepository.save(post);
+		notificationService.notifyDelete(postId, post.getUsername());
+		return ResponseEntity.ok("Post deleted successfully");
+	}
 
-        // get real user from DB
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        Post post = new Post();
-        post.setUserId(userId);
-        post.setUsername(user.getUsername()); // SAFE SOURCE
-        post.setContent(content);
-        post.setWalletAddress(walletAddress);
-        post.setPostHash(postHash);
-        post.setDeleted(false);
-        post.setCommunityId(communityId);
-
-        // save image if exists
-        if (image != null && !image.isEmpty()) {
-            String imageUrl = saveImage(image);
-            post.setImageUrl(imageUrl);
-        }
-
-        // save post first
-        Post savedPost = postRepository.save(post);
-
-        // blockchain (non-blocking)
-        try {
-            if (postHash != null && !postHash.isBlank()) {
-                String txHash = blockchainService.savePostHashToBlockchain(postHash);
-                savedPost.setBlockchainTxHash(txHash);
-                postRepository.save(savedPost);
-            }
-        } catch (Exception e) {
-            System.out.println("Blockchain failed but post saved: " + e.getMessage());
-        }
-
-        return ResponseEntity.ok(savedPost);
-    }
-
-    // ================================
-    // SAVE IMAGE TO SERVER
-    // ================================
-    private String saveImage(MultipartFile file) {
-        try {
-            String uploadDir = "uploads/posts/";
-            Files.createDirectories(Paths.get(uploadDir));
-
-            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            Path filePath = Paths.get(uploadDir + fileName);
-
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-            return uploadDir + fileName;
-
-        } catch (IOException e) {
-            throw new RuntimeException("Post image upload failed");
-        }
-    }
-
-    // ================================
-    // USER POSTS
-    // ================================
-    @GetMapping("/user/{userId}")
-    public List<Post> getPostByUser(@PathVariable Long userId) {
-        return postRepository.findByUserId(userId);
-    }
-
-    @GetMapping("/community/{communityId}")
-    public List<Post> getCommunityPosts(@PathVariable Long communityId) {
-        return postRepository.findByCommunityIdOrderByCreatedAtDesc(communityId);
-    }
-    // ================================
-    // DELETE POST
-    // ================================
-    @PostMapping("/{postId}/delete/{userId}")
-    public ResponseEntity<?> deletePost(@PathVariable Long postId, @PathVariable Long userId) {
-
-        Post post = postRepository.findById(postId).orElse(null);
-
-        if (post == null)
-            return ResponseEntity.notFound().build();
-
-        if (!post.getUserId().equals(userId))
-            return ResponseEntity.status(403).body("Not allowed");
-
-        post.setDeleted(true);
-        post.setContent("This post was deleted");
-        post.setImageUrl(null);
-
-        postRepository.save(post);
-
-        notificationService.notifyDelete(postId, post.getUsername());
-
-        return ResponseEntity.ok("Post deleted successfully");
-    }
-
-    // ================================
-    // ALL POSTS
-    // ================================
-    @GetMapping("/all")
-    public List<Post> getAllPosts() {
-        return postRepository.findAllByOrderByCreatedAtDesc();
-    }
+	@GetMapping("/all")
+	public List<Post> getAllPosts() {
+		return postRepository.findAllByOrderByCreatedAtDesc();
+	}
 }

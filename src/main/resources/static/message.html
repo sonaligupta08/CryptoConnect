@@ -4,112 +4,116 @@
 <meta charset="UTF-8">
 <title>Messages</title>
 
-<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script
+	src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 
 <style>
 body.dark {
-    background-color: #0d0d0d;
-    color: #ffffff;
-    font-family: Arial, sans-serif;
+	background-color: #0d0d0d;
+	color: #ffffff;
+	font-family: Arial, sans-serif;
 }
+
 #userListPanel {
-    width: 400px;
-    margin: 40px auto;
-    background: #1a1a1a;
-    border-radius: 10px;
-    padding: 15px;
+	width: 400px;
+	margin: 40px auto;
+	background: #1a1a1a;
+	border-radius: 10px;
+	padding: 15px;
 }
 
 #userList li {
-    list-style: none;
-    margin: 8px 0;
+	list-style: none;
+	margin: 8px 0;
 }
 
 #userList button {
-    width: 100%;
-    padding: 10px;
-    background: #2a2a2a;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 6px;
+	width: 100%;
+	padding: 10px;
+	background: #2a2a2a;
+	color: white;
+	border: none;
+	cursor: pointer;
+	border-radius: 6px;
 }
 
 /* CHAT */
 .chat-container {
-    width: 400px;
-    margin: 50px auto;
-    background: #1a1a1a;
-    border-radius: 10px;
-    padding: 15px;
+	width: 400px;
+	margin: 50px auto;
+	background: #1a1a1a;
+	border-radius: 10px;
+	padding: 15px;
 }
 
 .chat-header {
-    text-align: center;
-    border-bottom: 1px solid #333;
-    padding-bottom: 10px;
+	text-align: center;
+	border-bottom: 1px solid #333;
+	padding-bottom: 10px;
 }
 
 #message-box {
-    height: 300px;
-    overflow-y: auto;
-    margin: 15px 0;
+	height: 300px;
+	overflow-y: auto;
+	margin: 15px 0;
 }
 
 .chat-input {
-    display: flex;
+	display: flex;
 }
 
 .chat-input input {
-    flex: 1;
-    padding: 10px;
-    background: #2a2a2a;
-    border: none;
-    color: white;
+	flex: 1;
+	padding: 10px;
+	background: #2a2a2a;
+	border: none;
+	color: white;
 }
 
 .chat-input button {
-    padding: 10px 15px;
-    background: #00bcd4;
-    border: none;
-    cursor: pointer;
+	padding: 10px 15px;
+	background: #00bcd4;
+	border: none;
+	cursor: pointer;
 }
 </style>
 </head>
 
 <body class="dark">
 
-<!-- USER LIST PANEL -->
-<div id="userListPanel" style="display:none">
-    <h3>Select user to chat</h3>
-    <ul id="userList"></ul>
-</div>
+	<!-- USER LIST PANEL -->
+	<div id="userListPanel" style="display: none">
+		<h3>Select user to chat</h3>
+		<ul id="userList"></ul>
+	</div>
 
-<!-- CHAT PANEL -->
-<div id="chatPanel" style="display:none">
-    <div class="chat-container">
-        <div class="chat-header">
-            <h3 id="chatTitle">CryptoConnect Chat</h3>
-            <small id="loginInfo"></small>
-        </div>
+	<!-- CHAT PANEL -->
+	<div id="chatPanel" style="display: none">
+		<div class="chat-container">
+			<div class="chat-header">
+				<h3 id="chatTitle">CryptoConnect Chat</h3>
+				<small id="loginInfo"></small>
+			</div>
 
-        <div id="message-box"></div>
+			<div id="message-box"></div>
 
-        <div class="chat-input">
-            <input type="text" id="messageInput" placeholder="Type a message..." />
-            <button onclick="sendMessage()">Send</button>
-        </div>
-    </div>
-</div>
+			<div class="chat-input">
+				<input type="text" id="messageInput" placeholder="Type a message..." />
+				<button onclick="sendMessage()">Send</button>
+			</div>
+		</div>
+	</div>
 
-<script>
+	<script>
 
 let stompClient = null;
 
-const currentUser = JSON.parse(localStorage.getItem("currentUser") || {});
+const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
 const urlParams = new URLSearchParams(window.location.search);
-const receiverUser = urlParams.get("receiver");
+const receiverUser = urlParams.get("receiver")?.toLowerCase();
+currentUser.username = currentUser.username?.toLowerCase();
 
 if (!currentUser.username) {
     alert("Please login first");
@@ -163,18 +167,16 @@ function startChat(){
         "Logged in as " + currentUser.username;
 
     connectSocket();
-    loadChat(receiverUser);
 }
 
 function connectSocket() {
 
-    const socket = new SockJS(
-        window.location.origin + "/ws?username=" + currentUser.username
-    );
+	const socket = new SockJS("/ws?username=" + currentUser.username);
 
     stompClient = Stomp.over(socket);
 
     stompClient.connect({}, () => {
+        loadChat(receiverUser);
 
         stompClient.subscribe("/user/queue/messages", (msg) => {
 
@@ -201,9 +203,7 @@ function connectSocket() {
 }
 async function loadChat(receiver) {
 
-    const res = await fetch(
-        `${window.location.origin}/api/chat/${currentUser.username}/${receiver}`
-    );
+	const res = await fetch(`http://localhost:8080/api/chat/${currentUser.username}/${receiver}`);
 
     const messages = await res.json();
 

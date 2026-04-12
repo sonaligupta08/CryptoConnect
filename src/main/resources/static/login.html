@@ -2,140 +2,140 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login</title>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
-    <style>
-        body {
-            background: radial-gradient(circle at top, #001a33, #000 60%);
-            min-height: 100vh;
-        }
+<style>
+body {
+	background: radial-gradient(circle at top, #001a33, #000 60%);
+	min-height: 100vh;
+}
 
-        img {
-            height: 60px;
-            width: 60px;
-            border-radius: 50%;
-        }
+img {
+	height: 60px;
+	width: 60px;
+	border-radius: 50%;
+}
 
-        .logo {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            margin-top: 1.5rem;
-        }
+.logo {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	margin-top: 1.5rem;
+}
 
-        #form-container {
-            max-width: 400px;
-            padding: 2rem;
-            border-radius: 10px;
-            margin: 4rem auto;
-            background: #0B4D99;
-            opacity: 0;
-            transform: translateY(40px);
-            animation: fade 1.5s ease forwards;
-            box-shadow: 0 0 30px rgb(159, 85, 85);
-            border: 1px solid rgba(0, 191, 255, .3);
-            backdrop-filter: blur(12px);
-        }
+#form-container {
+	max-width: 400px;
+	padding: 2rem;
+	border-radius: 10px;
+	margin: 4rem auto;
+	background: #0B4D99;
+	opacity: 0;
+	transform: translateY(40px);
+	animation: fade 1.5s ease forwards;
+	box-shadow: 0 0 30px rgb(159, 85, 85);
+	border: 1px solid rgba(0, 191, 255, .3);
+	backdrop-filter: blur(12px);
+}
 
-        @keyframes fade {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
+@keyframes fade {from { opacity:0;
+	transform: translateY(40px);
+}
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+to {
+	opacity: 1;
+	transform: translateY(0);
+}
 
-        label {
-            color: white;
-        }
+}
+label {
+	color: white;
+}
 
-        .input-group-text {
-            cursor: pointer;
-            background: #062b55;
-            border: none;
-            color: white;
-        }
+.input-group-text {
+	cursor: pointer;
+	background: #062b55;
+	border: none;
+	color: white;
+}
 
-        .form-control:focus {
-            box-shadow: 0 0 10px #00bfff;
-            border-color: #00bfff;
-        }
+.form-control:focus {
+	box-shadow: 0 0 10px #00bfff;
+	border-color: #00bfff;
+}
 
-        .msg {
-            font-size: .9rem;
-            margin-bottom: 10px;
-            display: none;
-        }
+.msg {
+	font-size: .9rem;
+	margin-bottom: 10px;
+	display: none;
+}
 
-        .error {
-            color: #ff4d4d;
-        }
+.error {
+	color: #ff4d4d;
+}
 
-        .success {
-            color: lime;
-        }
+.success {
+	color: lime;
+}
 
-        .loading {
-            pointer-events: none;
-            opacity: .7;
-        }
-    </style>
+.loading {
+	pointer-events: none;
+	opacity: .7;
+}
+</style>
 </head>
 
 <body>
 
-    <div id="form-container">
+	<div id="form-container">
 
-        <a href="index.html" class="btn btn-light mb-3">
-            <i class="fa-solid fa-arrow-left"></i> Go Back
-        </a>
+		<a href="index.html" class="btn btn-light mb-3"> <i
+			class="fa-solid fa-arrow-left"></i> Go Back
+		</a>
 
-        <div class="logo">
-            <img src="bitcoin.png.png" alt="bitcoin">
-        </div>
+		<div class="logo">
+			<img src="bitcoin.png.png" alt="bitcoin">
+		</div>
 
-        <form id="loginForm">
+		<form id="loginForm">
 
-            <div id="formMsg" class="msg text-center"></div>
+			<div id="formMsg" class="msg text-center"></div>
 
-            <div class="mb-3">
-                <label>Email</label>
-                <input type="email" id="email" class="form-control" required>
-            </div>
+			<div class="mb-3">
+				<label>Email</label> <input type="email" id="email"
+					class="form-control" required>
+			</div>
 
-            <div class="mb-3">
-                <label>Password</label>
-                <div class="input-group">
-                    <input type="password" id="password" class="form-control" required>
-                    <span class="input-group-text" id="togglePass">
-                        <i class="fa fa-eye"></i>
-                    </span>
-                </div>
-            </div>
+			<div class="mb-3">
+				<label>Password</label>
+				<div class="input-group">
+					<input type="password" id="password" class="form-control" required>
+					<span class="input-group-text" id="togglePass"> <i
+						class="fa fa-eye"></i>
+					</span>
+				</div>
+			</div>
 
-            <button type="submit" class="btn btn-primary w-100 mt-2">Login</button>
+			<button type="submit" class="btn btn-primary w-100 mt-2">Login</button>
 
-            <a href="forget-password.html" class="d-block text-center mt-3 text-warning">Forget password?</a>
+			<a href="forget-password.html"
+				class="d-block text-center mt-3 text-warning">Forget password?</a>
 
-            <p class="text-center text-white mt-3">
-                Don't have an account?
-                <a href="signup.html" class="text-info">Signup</a>
-            </p>
+			<p class="text-center text-white mt-3">
+				Don't have an account? <a href="signup.html" class="text-info">Signup</a>
+			</p>
 
-        </form>
-    </div>
+		</form>
+	</div>
 
-    <script>
+	<script>
 
         const togglePass = document.getElementById("togglePass");
         const passwordInput = document.getElementById("password");
@@ -202,20 +202,18 @@
                     return;
                 }
 
-                const userId = data.id || data.userId;
-
-                if (!userId || !data.username) {
-                    showError("User data missing");
+                if (!data.token) {
+                    showError("Token missing from server");
                     formContainer.classList.remove("loading");
                     return;
                 }
 
+                localStorage.setItem("token", data.token);
                 localStorage.setItem("currentUser", JSON.stringify({
-                    id: userId,
+                    id: data.userId,
                     username: data.username,
                     email: data.email
                 }));
-
                 showSuccess("Login successful");
 
                 setTimeout(() => {

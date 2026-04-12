@@ -2,6 +2,7 @@ package com.example.cryptoconnect.config;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -12,6 +13,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import com.example.cryptoconnect.security.JwtFilter;
 
 @Configuration
 public class SecurityConfig {
@@ -21,6 +24,9 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+    
+    @Autowired
+    private JwtFilter jwtFilter;
 
     
     @Bean
@@ -58,7 +64,11 @@ public class SecurityConfig {
                 .requestMatchers("/api/users/**").permitAll()
                 .requestMatchers("/api/posts/**").permitAll()
                 .requestMatchers("/api/likes/**").permitAll()
+                .requestMatchers("/api/chat/**").permitAll()
                 .requestMatchers("/uploads/**").permitAll()
+                .requestMatchers("/ws/**").permitAll() 
+                .requestMatchers("/api/users/count").permitAll()
+                .requestMatchers("/ws/info/**").permitAll()  
 
                 
                 .requestMatchers(
@@ -85,9 +95,9 @@ public class SecurityConfig {
                 ).permitAll()
 
                 
-                .anyRequest().permitAll()  
+                .anyRequest().authenticated()  
             );
-
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }

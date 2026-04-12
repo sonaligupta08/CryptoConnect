@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,18 +17,22 @@ body {
 	color: #fff;
 	font-family: "Poppins", sans-serif;
 }
+
 .outer {
 	height: 100vh;
 }
+
 .sidebar {
 	background: #000;
 	border-right: 1px solid #2f3336;
 	padding: 2rem 1.5rem;
 }
+
 .sidebar ul {
 	list-style: none;
 	padding: 0;
 }
+
 .sidebar ul li {
 	display: flex;
 	gap: 10px;
@@ -37,6 +40,7 @@ body {
 	cursor: pointer;
 	font-size: 1.1rem;
 }
+
 .sidebar ul li:hover {
 	background: #16181c;
 	border-radius: 20px;
@@ -78,10 +82,6 @@ body {
 	margin-left: 150px;
 }
 
-.profile-handle {
-	color: #777;
-}
-
 .profile-bio {
 	color: #ccc;
 }
@@ -97,14 +97,9 @@ body {
 	cursor: pointer;
 }
 
-.tab:hover {
-	background: #16181c;
-}
-
 .tab.active {
 	border-bottom: 3px solid #1d9bf0;
 	color: #1d9bf0;
-	font-weight: 600;
 }
 </style>
 </head>
@@ -132,195 +127,114 @@ body {
 						<img id="profileImg" class="profile-dp">
 						<h2 id="profileName" class="profile-name"></h2>
 						<p class="profile-bio" id="displayBio"></p>
+
 						<button id="editProfileBtn" class="btn btn-outline-primary mt-2">Edit
 							Profile</button>
-
-						<button id="messageBtn" class="btn btn-primary mt-2 ms-2">
-							Message</button>
 					</div>
 				</div>
 
 				<div class="tabs">
-					<div class="tab active" onclick="switchTab('tweets', this)">Tweets</div>
-					<div class="tab" onclick="switchTab('media', this)">Media</div>
-					<div class="tab" onclick="switchTab('likes', this)">Likes</div>
+					<div class="tab active">Tweets</div>
 				</div>
 
 				<div id="user-posts" style="padding: 1rem;"></div>
+
 			</div>
 
 			<div class="col-md-3 d-none d-md-block"></div>
+
 		</div>
 	</div>
+
 	<script>
-let allPosts = [];
-let currentTab = "tweets";
-let likedPosts = [];
+const API_BASE = "http://localhost:8080";
 
-async function loadUserPosts() {
-	const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+async function loadProfile() {
+    const storedUser = JSON.parse(localStorage.getItem("currentUser"));
 
-	if (!currentUser || !currentUser.id) {
-		alert("Please login first");
-		location.href = "login.html";
-		return;
-	}
-
-	document.getElementById("profileName").innerText = currentUser.username;
-	document.getElementById("displayBio").innerText = currentUser.bio || "No bio yet";
-	document.getElementById("profileImg").src =
-		currentUser.profileImage
-		? "http://localhost:8080/" + currentUser.profileImage
-		: "default.png";
-
-	try {
-		const res = await fetch(`http://localhost:8080/api/posts/user/${currentUser.id}`);
-		allPosts = await res.json();
-		renderPosts();
-	} catch (err) {
-		console.error(err);
-	}
-}
-
-function renderPosts() {
-	const container = document.getElementById("user-posts");
-	container.innerHTML = "";
-
-	let filtered = [];
-
-	if (currentTab === "tweets") filtered = allPosts;
-	else if (currentTab === "media") filtered = allPosts.filter(p => p.imageUrl);
-	else if (currentTab === "likes") filtered = likedPosts;
-
-	if (filtered.length === 0) {
-		container.innerHTML = "<p style='color:#777'>No posts found</p>";
-		return;
-	}
-
-	filtered.forEach(post => {
-		const div = document.createElement("div");
-		div.style.borderBottom = "1px solid #2f3336";
-		div.style.padding = "15px";
-
-		div.innerHTML = `
-			<div style="display:flex; justify-content:space-between;">
-				<div style="display:flex; gap:10px;">
-					<div style="width:40px;height:40px;border-radius:50%;background:#333;text-align:center;line-height:40px;">
-						${(post.username || "U").charAt(0).toUpperCase()}
-					</div>
-					<div>
-						<p style="margin:0;font-weight:600">${post.username}</p>
-						<p style="margin:0;color:#777">@${post.username}</p>
-					</div>
-				</div>
-				<i class='bx bx-trash-alt' style="cursor:pointer;color:#ff4d4d" onclick="deletePost(${post.id})"></i>
-			</div>
-
-			<p style="margin-top:10px">${post.content}</p>
-			${post.imageUrl ? `<img src="${post.imageUrl}" style="width:100%;border-radius:10px">` : ""}
-
-			<!-- ✅ LIKE SECTION ADDED -->
-			<div style="display:flex; gap:15px; margin-top:10px;">
-				<span style="cursor:pointer;" onclick="toggleLike(${post.id})">❤️ Like</span>
-				<span style="cursor:pointer;" onclick="showLikedUsers(${post.id})">👁 View Likes</span>
-				<span id="like-count-${post.id}">0</span>
-			</div>
-		`;
-
-		container.appendChild(div);
-
-		loadLikeCount(post.id);
-	});
-}
-
-async function deletePost(id) {
-	const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-	if (!confirm("Delete this post?")) return;
-
-	try {
-		const res = await fetch(
-			`http://localhost:8080/api/posts/${id}/user/${currentUser.id}`,
-			{ method: "DELETE" }
-		);
-
-		if (res.ok) loadUserPosts();
-		else alert("Not allowed");
-	} catch {
-		alert("Delete failed");
-	}
-}
-
-async function toggleLike(postId) {
-	const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-
-	await fetch("http://localhost:8080/api/likes/toggle", {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify({
-			postId: postId,
-			userId: currentUser.id,
-			username: currentUser.username
-		})
-	});
-
-	loadLikeCount(postId);
-
-	if (currentTab === "likes") loadLikedPosts();
-}
-
-async function loadLikeCount(postId) {
-	const res = await fetch(`http://localhost:8080/api/likes/count/${postId}`);
-	const count = await res.text();
-	const el = document.getElementById(`like-count-${postId}`);
-	if (el) el.innerText = count;
-}
-
-async function showLikedUsers(postId) {
-	const res = await fetch(`http://localhost:8080/api/likes/users/${postId}`);
-	const users = await res.json();
-	let names = users.map(u => u.username).join("\n");
-	alert(names || "No likes yet");
-}
-
-async function loadLikedPosts() {
-	const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-	const res = await fetch(`http://localhost:8080/api/likes/posts/liked/${currentUser.id}`);
-	likedPosts = await res.json();
-	renderPosts();
-}
-
-function switchTab(tab, el) {
-	currentTab = tab;
-	document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-	el.classList.add("active");
-
-	if (tab === "likes") loadLikedPosts();
-	else renderPosts();
-}
-
-loadUserPosts();
-
-const editBtn = document.getElementById("editProfileBtn");
-editBtn.addEventListener("click", () =>{
-	window.location.href = "profilesetup.html"
-});
-
-const urlParams = new URLSearchParams(window.location.search);
-const profileUser = urlParams.get("user");
-
-const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
-
-if (profileUser === currentUser.username) {
- document.getElementById("messageBtn").style.display = "none";
-}
-
-document.getElementById("messageBtn").onclick = () => {
-    if (!profileUser) {
-        alert("User not found");
+    if (!storedUser || !storedUser.id) {
+        alert("Login first");
+        window.location.href = "login.html";
         return;
     }
-    window.location.href = "message.html?user=" + profileUser;
-};
+
+    try {
+        const res = await fetch(`${API_BASE}/api/users/${storedUser.id}`);
+        const user = await res.json();
+        localStorage.setItem("currentUser", JSON.stringify(user));
+
+        document.getElementById("profileName").innerText = user.username || "No username";
+        document.getElementById("displayBio").innerText = user.bio || "No bio yet";
+
+        const img = document.getElementById("profileImg");
+        img.src = user.profileImage && user.profileImage !== "null" ? API_BASE + "/" + user.profileImage : "default.png";
+
+        await loadUserPosts(user.id);
+
+    } catch (err) {
+        console.error(err);
+        alert("Failed to load profile");
+    }
+}
+
+async function loadUserPosts(userId) {
+    const res = await fetch(`${API_BASE}/api/posts/user/${userId}`);
+    const posts = await res.json();
+
+    // Sort by createdAt descending
+    posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    const container = document.getElementById("user-posts");
+    container.innerHTML = "";
+
+    posts.forEach(post => {
+        const postDiv = document.createElement("div");
+        postDiv.style.borderBottom = "1px solid #2f3336";
+        postDiv.style.padding = "1rem 0";
+        postDiv.style.display = "flex";
+        postDiv.style.flexDirection = "column";
+
+        // Date/Time
+        const dateDiv = document.createElement("div");
+        dateDiv.innerText = new Date(post.createdAt).toLocaleString("en-IN", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true
+        });
+        dateDiv.style.color = "#888";
+        dateDiv.style.fontSize = "0.75rem";
+        dateDiv.style.textAlign = "left";
+        postDiv.appendChild(dateDiv);
+
+        // Username
+        const userDiv = document.createElement("strong");
+        userDiv.innerText = post.username;
+        postDiv.appendChild(userDiv);
+
+        // Content
+        const contentDiv = document.createElement("div");
+        contentDiv.innerText = post.content;
+        postDiv.appendChild(contentDiv);
+
+        // Image if exists
+        if (post.imageUrl && post.imageUrl !== "null") {
+            const img = document.createElement("img");
+            img.src = API_BASE + "/" + post.imageUrl;
+            img.style.width = "100%";
+            img.style.maxHeight = "300px";
+            img.style.objectFit = "cover";
+            img.style.marginTop = "0.5rem";
+            postDiv.appendChild(img);
+        }
+
+        container.appendChild(postDiv);
+    });
+}
+
+loadProfile();
 </script>
 
 </body>

@@ -15,7 +15,7 @@ public class Post {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	public String getBlockchainTxHash() {
 		return blockchainTxHash;
 	}
@@ -26,18 +26,19 @@ public class Post {
 
 	@Column(length = 100)
 	private String blockchainTxHash;
-	
-	private Long userId;  //owner id
-	private String username; //owner name
+
+	private Long userId; // owner id
+	private String username; // owner name
 	private String content;
+
 	@Column(columnDefinition = "LONGTEXT")
 	private String imageUrl;
 	private String postHash;
 	private String walletAddress;
 	private boolean deleted = false;
-	
+
 	private Long communityId;
-	
+
 	public Long getCommunityId() {
 		return communityId;
 	}

@@ -28,26 +28,28 @@ public class UserController {
 
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@GetMapping("/users")
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
+	public List<User> getAllUsers() {
+		return userRepository.findAll();
+	}
+
+	@GetMapping("/{id}")
+	public ResponseEntity<User> getUserById(@PathVariable Long id) {
+		User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+		return ResponseEntity.ok(user);
+	}
 
 	@GetMapping("/chat-users/{username}")
 	public List<User> getUsersForChat(@PathVariable String username) {
-	    return userRepository.findByUsernameNot(username);
+		return userRepository.findByUsernameNot(username);
 	}
 
 	@PutMapping("/profile/{id}")
-	public ResponseEntity<User> updateProfile(
-			@PathVariable Long id,
-			@RequestParam String username,
-			@RequestParam(required = false) String bio,
-			@RequestParam(required = false) MultipartFile profileImage) {
+	public ResponseEntity<User> updateProfile(@PathVariable Long id, @RequestParam String username,
+			@RequestParam(required = false) String bio, @RequestParam(required = false) MultipartFile profileImage) {
 
-		User user = userRepository.findById(id)
-				.orElseThrow(() -> new RuntimeException("User not found"));
+		User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
 
 		user.setUsername(username);
 		user.setBio(bio);
@@ -62,21 +64,25 @@ public class UserController {
 	}
 
 	private String saveImage(MultipartFile file) {
-	    try {
-	        String uploadDir = "uploads/profile/";
-	        Files.createDirectories(Paths.get(uploadDir));
+		try {
+			String uploadDir = "uploads/profile/";
+			Files.createDirectories(Paths.get(uploadDir));
 
-	        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-	        Path filePath = Paths.get(uploadDir + fileName);
+			String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+			Path filePath = Paths.get(uploadDir + fileName);
 
-	        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+			Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-	        return "uploads/profile/" + fileName;
+			return "uploads/profile/" + fileName;
 
-	    } catch (IOException e) {
-	        throw new RuntimeException("Image upload failed");
-	    }
+		} catch (IOException e) {
+			throw new RuntimeException("Image upload failed");
+		}
 	}
-	
-	
+
+	@GetMapping("/count")
+	public ResponseEntity<Long> getUserCount() {
+		return ResponseEntity.ok(userRepository.count());
+	}
+
 }

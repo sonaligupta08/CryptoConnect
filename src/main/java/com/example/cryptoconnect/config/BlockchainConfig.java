@@ -10,19 +10,19 @@ import org.web3j.protocol.http.HttpService;
 @Configuration
 public class BlockchainConfig {
 
-    @Value("${blockchain.rpc.url}")
-    private String rpcUrl;
+	@Value("${blockchain.rpc.url}")
+	private String rpcUrl;
 
-    @Value("${blockchain.private.key}")
-    private String privateKey;
+	@Value("${blockchain.private.key}")
+	private String privateKey;
 
-    @Bean
-    public Web3j web3j() {
-        return Web3j.build(new HttpService(rpcUrl));
-    }
+	@Bean
+	public Web3j web3j() {
+		return Web3j.build(new HttpService(rpcUrl));
+	}
 
-    @Bean
-    public Credentials credentials() {
-        return Credentials.create(privateKey);
-    }
+	@Bean
+	public Credentials credentials() {
+		return Credentials.create(privateKey);
+	}
 }

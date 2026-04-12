@@ -358,6 +358,53 @@ body {
 	border-radius: 50%;
 	object-fit: cover;
 }
+
+body {
+	background-color: #0f172a;
+	color: white;
+	font-family: 'Segoe UI', sans-serif;
+}
+
+.dashboard-stats {
+	display: flex;
+	gap: 20px;
+	margin: 30px;
+}
+
+.stat-card {
+	background: linear-gradient(145deg, #1e293b, #0f172a);
+	padding: 25px;
+	border-radius: 16px;
+	width: 200px;
+	display: flex;
+	align-items: center;
+	gap: 20px;
+	box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+	transition: 0.3s ease;
+}
+
+.stat-card:hover {
+	transform: translateY(-5px);
+}
+
+.stat-icon {
+	font-size: 30px;
+	color: #3b82f6;
+	background: rgba(59, 130, 246, 0.15);
+	padding: 15px;
+	border-radius: 12px;
+}
+
+.stat-info h2 {
+	font-size: 28px;
+	margin: 0;
+	font-weight: bold;
+}
+
+.stat-info p {
+	margin: 5px 0 0;
+	color: #94a3b8;
+}
 </style>
 </head>
 
@@ -375,12 +422,12 @@ body {
 					<ul>
 						<li><i class='bx bx-home'></i> Home</li>
 						<li><i class='bx bx-bell'></i> Notification</li>
+						
+						<li onclick="window.location.href='community.html'"><i
+							class='bx bx-user'></i> Community</li>
 
 						<li onclick="window.location.href='message.html'"><i
 							class='bx bx-message'></i> Messages</li>
-
-						<li onclick="window.location.href='community.html'"><i
-							class='bx bx-group'></i> Communities</li>
 
 						<li onclick="window.location.href='profile.html'"><i
 							class='bx bx-user'></i> Profile</li>
@@ -393,9 +440,17 @@ body {
 			<div class="col-12 col-md-6 content">
 				<h5 id="feedTitle">For You</h5>
 
-				<button onclick="exitCommunity()"
-					style="margin-bottom: 10px; background: #1d9bf0; border: none; color: white; padding: 6px 12px; border-radius: 20px;">
-					Leave Community View</button>
+				<div class="dashboard-stats">
+					<div class="stat-card">
+						<div class="stat-icon">
+							<i class='bx bx-user'></i>
+						</div>
+						<div class="stat-info">
+							<h2 id="userCount">0</h2>
+							<p>Total Users</p>
+						</div>
+					</div>
+				</div>
 
 				<div class="divide">
 					<div class="profile-section">
@@ -470,289 +525,293 @@ body {
 				href="#" class="text-light"><i class='bx bx-user'></i></a>
 		</div>
 	</nav>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
 
-	<!-- SCRIPT -->
-	<script>
-		// Get logged-in user from localStorage
-		const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
-		const USER_ID = currentUser.id;
-		
-		const API = "http://localhost:8080/api";
-		
-		// Wallet Connect Elements
-		const walletBtn = document.getElementById("connectWalletBtn");
-		const walletDisplay = document.getElementById("walletAddress");
+    const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+    const USER_ID = currentUser.id;
 
-		// Wallet connect logic
-		walletBtn.addEventListener("click", async () => {
-		    if (window.ethereum) {
-		        try {
-		            const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-		            const address = accounts[0];
-		            walletDisplay.innerText = address;
-		            currentUser.walletAddress = address;
-		            localStorage.setItem("currentUser", JSON.stringify(currentUser));
-		        } catch (err) {
-		            alert("Wallet connection failed");
-		            console.error(err);
-		        }
-		    } else {
-		        alert("MetaMask not found");
-		    }
-		});
+    const API = "http://localhost:8080/api";
+    const API_BASE = "http://localhost:8080/";
+    const token = localStorage.getItem("token");
 
-		// Redirect to login if user not logged in
-		if (!currentUser.id) {
-			alert("Please login first");
-			window.location.href = "login.html";
-		}
+    if (!currentUser.id) {
+        alert("Please login first");
+        window.location.href = "login.html";
+        return;
+    }
 
-		const displayName = currentUser.username || "Guest";
+    const displayName = currentUser.username || "Guest";
 
-		document.querySelectorAll(".username").forEach(el => el.innerText = displayName);
-		document.querySelectorAll(".handle").forEach(el => el.innerText = "@" + displayName);
-		
-		const API_BASE = "http://localhost:8080/";
-		
-		document.querySelectorAll(".profile-pic").forEach(el => {
-		  if (currentUser.profileImage) {
-		    el.innerHTML = `
-		      <img src="${API_BASE + currentUser.profileImage}" class="profile-img">
-		    `;
-		  } else {
-		    el.innerText = displayName.charAt(0).toUpperCase();
-		  }
-		});
+    document.querySelectorAll(".username").forEach(el => el.innerText = displayName);
+    document.querySelectorAll(".handle").forEach(el => el.innerText = "@" + displayName);
 
+    document.querySelectorAll(".profile-pic").forEach(el => {
+        if (currentUser.profileImage) {
+            el.innerHTML = `<img src="${API_BASE + currentUser.profileImage}" class="profile-img">`;
+        } else {
+            el.innerText = displayName.charAt(0).toUpperCase();
+        }
+    });
 
-		// Function to load posts from backend
-		async function loadPosts() {
-			try {
-				const res = await fetch(`http://localhost:8080/api/posts/all`);
-				const posts = await res.json();
-				
-				const container = document.getElementById("post-feed");
-				container.innerHTML = "";
+    // =========================
+    // WALLET CONNECT
+    // =========================
+    const walletBtn = document.getElementById("connectWalletBtn");
+    const walletDisplay = document.getElementById("walletAddress");
 
-				posts.forEach(post => {
-				    const div = document.createElement("div");
-				    div.className = "post-card";
+    if (walletBtn) {
+        walletBtn.addEventListener("click", async () => {
+            if (!window.ethereum) return alert("MetaMask not found");
 
-				    if (post.deleted) {
-				        // 🔒 Deleted post view
-				        div.innerHTML = `
-				            <div class="profile-section">
-				                <div class="profile-pic">${post.username.charAt(0)}</div>
-				                <div>
-				                    <p class="username">${post.username}</p>
-				                    <p class="handle">@${post.username}</p>
-				                </div>
-				            </div>
+            try {
+                const accounts = await ethereum.request({ method: "eth_requestAccounts" });
+                const address = accounts[0];
+                walletDisplay.innerText = address;
 
-				            <p class="post-text" style="color:#71767b; font-style:italic;">
-				                This post was deleted
-				            </p>
-				        `;
-				    } else {
-				        div.innerHTML = `
-				            <div class="profile-section">
-				        	<div class="profile-pic">
-				        	  ${
-				        	    post.profileImage
-				        	      ? `<img src="http://localhost:8080/${post.profileImage}" class="profile-img">`
-				        	      : post.username.charAt(0)
-				        	  }
-				        	</div>
-				                <div>
-				                    <p class="username">${post.username}</p>
-				                    <p class="handle">@${post.username}</p>
-				                </div>
-				            </div>
+                currentUser.walletAddress = address;
+                localStorage.setItem("currentUser", JSON.stringify(currentUser));
+            } catch (err) {
+                console.error(err);
+                alert("Wallet connection failed");
+            }
+        });
+    }
 
-				            <p class="post-text">${post.content}</p>
+    // =========================
+    // DELETE POST FUNCTION (moved outside loadPosts)
+    // =========================
+    window.deletePost = async function(postId) {
+        if (!confirm("Delete this post?")) return;
 
-				            ${post.imageUrl ? `
-				            		<img src="http://localhost:8080/${post.imageUrl}" style="width:100%; border-radius:12px;">
-				            ` : ""}
+        const res = await fetch(`${API}/posts/${postId}/delete/${currentUser.id}`, {
+            method: "POST",
+            headers: token ? { "Authorization": "Bearer " + token } : {}
+        });
 
-				            ${post.userId === currentUser.id ? `
-				                <button onclick="deletePost(${post.id})"
-				                    style="color:#ff4d4d; background:none; border:none; margin-top:8px;">
-				                    Delete
-				                </button>
-				            ` : ""}
-				        `;
-				    }
+        if (!res.ok) {
+            alert("Delete failed");
+            return;
+        }
 
-				    container.appendChild(div);
-				});
+        loadPosts();
+    };
 
-			} catch (err) {
-				console.error("Failed to load posts", err);
-			}
-		}
-		
+    // =========================
+    // LOAD POSTS
+    // =========================
+    async function loadPosts() {
+        try {
+            const res = await fetch(`${API}/posts/all`, {
+                headers: token ? { "Authorization": "Bearer " + token } : {}
+            });
 
-		// Like toggle function
-		async function toggleLike(postId) {
-			await fetch("http://localhost:8080/api/likes/toggle", {
-				method: "POST",
-				headers: {"Content-Type": "application/json"},
-				body: JSON.stringify({
-					postId: postId,
-					userId: currentUser.id,
-					username: currentUser.username
-				})
-			});
-			loadLikeStatus(postId);
-			loadLikeCount(postId);
-		}
+            if (!res.ok) return console.error("Post fetch failed:", res.status);
 
-		// Load like count
-		async function loadLikeCount(postId) {
-			const res = await fetch(`http://localhost:8080/api/likes/count/${postId}`);
-			const count = await res.text();
-			document.getElementById(`like-count-${postId}`).innerText = count + " Likes";
-		}
+            const posts = await res.json();
+            if (!Array.isArray(posts)) return console.error("Invalid post response", posts);
 
-		// Load like status (red heart or empty)
-		async function loadLikeStatus(postId) {
-			const res = await fetch(
-				`http://localhost:8080/api/likes/status/${postId}/${currentUser.id}`
-			);
-			const liked = await res.json();
-			const icon = document.getElementById(`like-icon-${postId}`);
-			icon.className = liked ? "bx bxs-heart" : "bx bx-heart";
-			icon.style.color = liked ? "#ff4d4d" : "white";
-		}
+            const container = document.getElementById("post-feed");
+            container.innerHTML = "";
 
-		// Post new content listener
-		document.querySelector(".post").addEventListener("click", async () => {
-			const content = document.getElementById("input").value.trim();
-			if (!content) return alert("Write something to post!");
+            posts.forEach(post => {
+                const div = document.createElement("div");
+                div.className = "post-card";
 
-			// Generate post hash
-			const postHash = btoa((currentUser.walletAddress || "guest") + "_" + content + "_" + new Date().getTime());
+                if (post.deleted) {
+                    div.innerHTML = `
+                        <div class="profile-section">
+                            <div class="profile-pic">${post.username.charAt(0)}</div>
+                            <div>
+                                <p class="username">${post.username}</p>
+                                <p class="handle">@${post.username}</p>
+                            </div>
+                        </div>
+                        <p class="post-text" style="color:#71767b;font-style:italic;">
+                            This post was deleted
+                        </p>
+                    `;
+                } else {
+                    div.innerHTML = `
+                        <div class="profile-section">
+                            <div class="profile-pic">${post.username.charAt(0)}</div>
+                            <div>
+                                <p class="username">${post.username}</p>
+                                <p class="handle">@${post.username}</p>
+                            </div>
+                        </div>
 
-			try {
-				const formData = new FormData();
-				formData.append("userId", currentUser.id);
-				formData.append("content", content);
-				formData.append("postHash", postHash);
-				formData.append("walletAddress", currentUser.walletAddress || "");
-				
-				if (selectedCommunityId) {
-				    formData.append("communityId", selectedCommunityId);
-				}
+                        <p class="post-text">${post.content}</p>
 
-				if (imageInput.files[0]) {
-				  formData.append("image", imageInput.files[0]);
-				}
+                        ${post.imageUrl ? `<img src="${API_BASE + post.imageUrl}" style="width:100%;border-radius:12px;">` : ""}
 
-				const token = localStorage.getItem("token"); 
+                        <div style="margin-top:8px; display:flex; align-items:center; gap:8px;">
+                            <button class="like-btn" style="background:none; border:none; color:#fff; cursor:pointer;">
+                                <i class="bx bx-heart"></i> <span class="like-count">0</span>
+                            </button>
+                        </div>
 
-				await fetch("http://localhost:8080/api/posts/create", {
-				  method: "POST",
-				  headers: {
-				    "Authorization": "Bearer " + token
-				  },
-				  body: formData
-				});
+                        ${post.userId === currentUser.id
+                            ? `<button onclick="deletePost(${post.id})"
+                               style="color:#ff4d4d;background:none;border:none;margin-top:8px;">
+                               Delete
+                               </button>`
+                            : ""}
+                    `;
+                }
 
-				document.getElementById("input").value = "";
-				document.getElementById("image-preview").innerHTML = "";
-				selectedImage = null;
+                container.appendChild(div);
 
-				// Reload posts
-				loadPosts();
+                // LIKE BUTTON TOGGLE
+                const likeBtn = div.querySelector(".like-btn");
+                const likeCountSpan = div.querySelector(".like-count");
+                let liked = false;
 
-			} catch (err) {
-				console.error("Failed to post", err);
-				alert("Failed to post content");
-			}
-		});
+                if (likeBtn && likeCountSpan) {
+                    likeBtn.addEventListener("click", async () => {
+                        liked = !liked;
+                        likeBtn.querySelector("i").style.color = liked ? "red" : "#fff";
 
-		// Image preview logic
-		const imageInput = document.getElementById("imageUpload");
-		let selectedImage = null;
+                        let count = parseInt(likeCountSpan.innerText);
+                        likeCountSpan.innerText = liked ? count + 1 : count - 1;
 
-		imageInput.addEventListener("change", () => {
-			const file = imageInput.files[0];
-			if (!file) return;
+                        // optional backend call
+                        try {
+                            await fetch(`${API}/posts/${post.id}/like`, {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "Authorization": token ? "Bearer " + token : ""
+                                },
+                                body: JSON.stringify({ userId: currentUser.id, liked })
+                            });
+                        } catch (err) {
+                            console.error("Failed to update like", err);
+                        }
+                    });
+                }
+            });
+        } catch (err) {
+            console.error(err);
+        }
+    }
 
-			const reader = new FileReader();
-			reader.onload = e => {
-				selectedImage = e.target.result;
-				document.getElementById("image-preview").innerHTML = `<img src="${selectedImage}">`;
-			};
-			reader.readAsDataURL(file);
-		});
+    // =========================
+    // CREATE POST
+    // =========================
+    const imageInput = document.getElementById("imageUpload");
+    let selectedImage = null;
 
-		// Initial load of posts
-		loadPosts();
-		
+    if (imageInput) {
+        imageInput.addEventListener("change", () => {
+            const file = imageInput.files[0];
+            if (!file) return;
 
-		// WebSocket/STOMP setup
-		let stompClient = null;
-		function connectSocket() {
-			const socket = new SockJS(
-					  "http://localhost:8080/ws?username=" + currentUser.username
-					);
-					const stompClient = Stomp.over(socket);
+            const reader = new FileReader();
+            reader.onload = e => {
+                selectedImage = e.target.result;
+                document.getElementById("image-preview").innerHTML = `<img src="${selectedImage}">`;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
 
-		    
-		    stompClient.connect({}, () => {
-		    	// Subscribe to notifications
-		    	stompClient.subscribe("/topic/notifications", (msg) => {
-		    	    const data = JSON.parse(msg.body);
-		    	    console.log("Notification:", data);
-		    	    alert(`Notification: ${data.content}`);
-		    	});
-		    });
-		}
+    const postButton = document.querySelector(".post");
+    if (postButton) {
+        postButton.addEventListener("click", async () => {
+            const content = document.getElementById("input").value.trim();
+            if (!content) return alert("Write something to post!");
 
-		connectSocket();
-		
-		async function deletePost(postId) {
-		    if (!confirm("Delete this post?")) return;
+            const postHash = btoa(
+                (currentUser.walletAddress || "guest") +
+                "_" + content +
+                "_" + Date.now()
+            );
 
-		    await fetch(`http://localhost:8080/api/posts/${postId}/delete/${currentUser.id}`, {
-		        method: "POST"
-		    });
+            const formData = new FormData();
+            formData.append("userId", currentUser.id);
+            formData.append("content", content);
+            formData.append("postHash", postHash);
+            formData.append("walletAddress", currentUser.walletAddress || "");
 
-		    loadPosts();
-		}
-		
-		let selectedCommunityId = null;
+            if (imageInput.files[0])
+                formData.append("image", imageInput.files[0]);
 
-		const savedCommunity = localStorage.getItem("selectedCommunityId");
-		if(savedCommunity){
-		    selectedCommunityId = savedCommunity;
+            try {
+                const headers = token ? { "Authorization": "Bearer " + token } : {};
+                const res = await fetch(`${API}/posts/create`, {
+                    method: "POST",
+                    headers,
+                    body: formData
+                });
 
-		    // show community title
-		    loadCommunityTitle(savedCommunity);
-		}
-		
-		async function loadCommunityTitle(id){
+                if (!res.ok) {
+                    alert("Post failed");
+                    return;
+                }
 
-		    const res = await fetch(`${API}/communities/all`);
-		    if(!res.ok) return;
+                document.getElementById("input").value = "";
+                document.getElementById("image-preview").innerHTML = "";
+                selectedImage = null;
 
-		    const list = await res.json();
-		    const community = list.find(c => c.id == id);
+                loadPosts();
+            } catch (err) {
+                console.error("Post failed", err);
+            }
+        });
+    }
 
-		    if(community){
-		        document.getElementById("feedTitle").innerText =
-		            "Community: " + community.name;
-		    }
-		}
-		
-		function exitCommunity(){
-		    localStorage.removeItem("selectedCommunityId");
-		    location.reload();
-		}
+    // =========================
+    // USER COUNT
+    // =========================
+    async function loadUserCount() {
+        try {
+            const res = await fetch(`${API}/users/count`);
+            const count = await res.json();
+            animateCounter("userCount", count);
+        } catch (err) {
+            console.error(err);
+        }
+    }
 
-	</script>
+    function animateCounter(id, target) {
+        let count = 0;
+        const element = document.getElementById(id);
+        const interval = setInterval(() => {
+            count++;
+            element.innerText = count;
+            if (count >= target) clearInterval(interval);
+        }, 30);
+    }
+
+    // =========================
+    // SOCKET CONNECTION
+    // =========================
+    let stompClient = null;
+    function connectSocket() {
+        const socket = new SockJS("http://localhost:8080/ws?username=" + currentUser.username);
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({ Authorization: "Bearer " + token }, () => {
+            stompClient.subscribe("/topic/notifications", msg => {
+                const data = JSON.parse(msg.body);
+                alert("Notification: " + data.message);
+            });
+        }, err => {
+            console.error("WebSocket failed:", err);
+        });
+    }
+
+    // =========================
+    // INITIAL LOAD
+    // =========================
+    loadPosts();
+    loadUserCount();
+    connectSocket();
+
+});
+</script>
+</script>
 
 </body>
 </html>
