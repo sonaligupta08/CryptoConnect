@@ -83,33 +83,37 @@ body {
 /* Community Cards */
 .community-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
 	gap: 20px;
 }
 
 .community-card {
-	border: 1px solid #2f3336;
-	border-radius: 15px;
-	padding: 15px;
-	transition: 0.3s;
+	background: linear-gradient(145deg, #0f172a, #020617);
+	border-radius: 18px;
+	padding: 18px;
+	border: 1px solid #1e293b;
+	transition: 0.3s ease;
+	position: relative;
+	word-wrap: break-word;
 }
 
 .community-card:hover {
-	transform: translateY(-5px);
-	border-color: #1d9bf0;
+	transform: translateY(-6px);
+	border-color: #3b82f6;
+	box-shadow: 0 10px 40px rgba(59, 130, 246, 0.25);
 }
 
-.community-header {
+.community-top {
 	display: flex;
 	align-items: center;
-	gap: 10px;
+	gap: 12px;
 }
 
 .community-icon {
-	width: 45px;
-	height: 45px;
+	width: 50px;
+	height: 50px;
 	border-radius: 50%;
-	background: #1d9bf0;
+	background: linear-gradient(135deg, #3b82f6, #06b6d4);
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -117,165 +121,215 @@ body {
 }
 
 .community-name {
-	font-size: 1.2rem;
 	font-weight: 600;
+	font-size: 1.1rem;
+}
+
+.community-members {
+	font-size: 0.8rem;
+	color: #94a3b8;
 }
 
 .community-desc {
-	font-size: 0.9rem;
-	color: #aaa;
-	margin: 10px 0;
+	margin: 12px 0;
+	color: #cbd5f5;
 }
 
 .join-btn {
-	background: transparent;
-	border: 1px solid #1d9bf0;
-	color: #1d9bf0;
-	padding: 6px 15px;
 	border-radius: 20px;
-	cursor: pointer;
+	padding: 6px 12px;
+	border: 1px solid #3b82f6;
+	background: transparent;
+	color: #3b82f6;
+	font-size: 13px;
 }
 
 .join-btn.joined {
-	background: #1d9bf0;
+	background: #3b82f6;
 	color: white;
+}
+
+.delete-btn {
+	font-size: 13px;
+	padding: 6px 12px;
+	background: #ff4d4d;
+	border: none;
+	color: white;
+	border-radius: 20px;
+	margin-left: 10px;
+}
+
+/* 🔥 MOBILE FIX */
+@media (max-width: 768px) {
+
+    .container-main {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        display: flex;
+        justify-content: space-around;
+        border-right: none;
+        border-bottom: 1px solid #2f3336;
+        padding: 10px;
+    }
+
+    .sidebar ul {
+        display: flex;
+        width: 100%;
+        justify-content: space-around;
+    }
+
+    .sidebar li {
+        font-size: 0.9rem;
+        padding: 6px;
+    }
+
+    .content {
+        padding: 1rem;
+    }
+
+    .community-grid {
+        grid-template-columns: 1fr;
+    }
 }
 </style>
 </head>
 
 <body>
 
-	<div class="container-main">
+<div class="container-main">
 
-		<!-- Sidebar -->
-		<div class="sidebar">
-			<ul>
-				<li onclick="window.location.href='dashboard.html'"><i
-					class='bx bx-home'></i> Home</li>
-				<li><i class='bx bx-group'></i> Communities</li>
-				<li onclick="window.location.href='profile.html'"><i
-					class='bx bx-user'></i> Profile</li>
-			</ul>
+	<!-- Sidebar -->
+	<div class="sidebar">
+		<ul>
+			<li onclick="window.location.href='dashboard.html'"><i class='bx bx-home'></i> Home</li>
+			<li><i class='bx bx-group'></i> Communities</li>
+			<li onclick="window.location.href='profile.html'"><i class='bx bx-user'></i> Profile</li>
+		</ul>
+	</div>
+
+	<!-- Main Content -->
+	<div class="content">
+
+		<h2>Communities</h2>
+
+		<!-- Create Community -->
+		<div class="create-box">
+			<h5>Create Community</h5>
+			<input type="text" id="communityName" placeholder="Community Name">
+			<textarea id="communityDesc" rows="2" placeholder="Description"></textarea>
+			<button class="create-btn" onclick="createCommunity()">Create</button>
 		</div>
 
-		<!-- Main Content -->
-		<div class="content">
-
-			<h2>Communities</h2>
-
-			<!-- Create Community -->
-			<div class="create-box">
-				<h5>Create Community</h5>
-				<input type="text" id="communityName" placeholder="Community Name">
-				<textarea id="communityDesc" rows="2" placeholder="Description"></textarea>
-				<button class="create-btn" onclick="createCommunity()">Create</button>
-			</div>
-
-			<!-- Community List -->
-			<div class="community-grid" id="communityList"></div>
-
-		</div>
+		<!-- Community List -->
+		<div class="community-grid" id="communityList"></div>
 
 	</div>
 
-	<script>
+</div>
+
+<script>
 const API = "http://localhost:8080/api";
 
-async function createCommunity() {
-    const name = document.getElementById("communityName").value.trim();
-    const desc = document.getElementById("communityDesc").value.trim();
-    const token = localStorage.getItem("token");
-
-    if (!name) return alert("Community name required");
-
-    const res = await fetch(`${API}/communities/create`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + token
-        },
-        body: JSON.stringify({ name, description: desc })
-    });
-
-    if (!res.ok) return alert("Failed");
-
-    loadCommunities();
-}
-
-async function deleteCommunity(id) {
-    const token = localStorage.getItem("token");
-
-    const res = await fetch(`${API}/communities/${id}`, {
-        method: "DELETE",
-        headers: {
-            "Authorization": "Bearer " + token
-        }
-    });
-
-    if (!res.ok) {
-        alert("Delete failed");
-        return;
-    }
-
-    alert("Deleted");
-    loadCommunities();
-}
-
 async function loadCommunities() {
-    const res = await fetch(`${API}/communities/all`);
-    const data = await res.json();
 
     const container = document.getElementById("communityList");
+    container.innerHTML = "Loading...";
+
+    const token = localStorage.getItem("token");
+    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+    const [allRes, userRes] = await Promise.all([
+        fetch(`${API}/communities/all`),
+        fetch(`${API}/communities/user/${currentUser.id}`, {
+            headers: { "Authorization": "Bearer " + token }
+        })
+    ]);
+
+    const communities = await allRes.json();
+    const memberships = await userRes.json();
+
     container.innerHTML = "";
 
-    data.forEach(c => {
+    for (const c of communities) {
+
+        const memberRes = await fetch(`${API}/communities/${c.id}/members/count`);
+        const count = await memberRes.json();
+
+        const membership = memberships.find(m => m.communityId === c.id);
+        const joined = !!membership;
+        const isCreator = c.createdBy === currentUser.id;
+
         const div = document.createElement("div");
         div.className = "community-card";
 
         div.innerHTML = `
-            <div class="community-header">
+            <div class="community-top">
                 <div class="community-icon">${c.name.charAt(0)}</div>
-                <div class="community-name">${c.name}</div>
+                <div>
+                    <div>${c.name}</div>
+                    <small>${count} members</small>
+                </div>
             </div>
 
-            <div class="community-desc">${c.description || ""}</div>
+            <p>${c.description || ""}</p>
 
-            <button class="join-btn" onclick="toggleJoin(this, ${c.id})">Join</button>
+            <div style="display:flex; gap:10px;">
+                <button class="join-btn ${joined ? "joined" : ""}">
+                    ${joined ? "Leave" : "Join"}
+                </button>
+
+                ${isCreator ? `<button class="delete-btn">Delete</button>` : ""}
+            </div>
         `;
 
-        container.appendChild(div);
-    });
-}
+        const joinBtn = div.querySelector(".join-btn");
+        joinBtn.onclick = async () => {
 
-//handles both join and leave
-async function toggleJoin(btn, id) {
-    const joined = btn.classList.contains("joined");
-    const token = localStorage.getItem("token");
+            const action = joined ? "leave" : "join";
 
-    try {
-        const res = await fetch(`${API}/communities/${id}/${joined ? "leave" : "join"}`, {
-            method: "POST",
-            headers: {
-                "Authorization": "Bearer " + token
-            }
-        });
+            const res = await fetch(`${API}/communities/${c.id}/${action}`, {
+                method: "POST",
+                headers: { "Authorization": "Bearer " + token }
+            });
 
-        if (!res.ok) {
-            alert("Action failed");
-            return;
+            if (!res.ok) return alert("Failed");
+
+            loadCommunities();
+        };
+
+        const deleteBtn = div.querySelector(".delete-btn");
+        if (deleteBtn) {
+            deleteBtn.onclick = async () => {
+
+                if (!confirm("Delete this community?")) return;
+
+                const res = await fetch(`${API}/communities/${c.id}`, {
+                    method: "DELETE",
+                    headers: { "Authorization": "Bearer " + token }
+                });
+
+                if (!res.ok) {
+                    const err = await res.text();
+                    alert(err);
+                    return;
+                }
+
+                loadCommunities();
+            };
         }
 
-        btn.classList.toggle("joined");
-        btn.innerText = joined ? "Join" : "Joined";
-
-    } catch (err) {
-        console.error(err);
-        alert("Server error");
+        container.appendChild(div);
     }
 }
 
 loadCommunities();
 </script>
+
+<!-- 🔥 REQUIRED -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

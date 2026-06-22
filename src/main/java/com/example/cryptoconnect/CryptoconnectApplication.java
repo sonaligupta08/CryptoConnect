@@ -9,6 +9,5 @@ public class CryptoconnectApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(CryptoconnectApplication.class, args);
 	}
-
 }
  

@@ -1,7 +1,6 @@
 package com.example.cryptoconnect.security;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
@@ -11,24 +10,38 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private final SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+    // 🔥 CONSTANT SECRET (must be same always)
+    private final String SECRET = "my-super-secret-key-which-is-very-long-123456789";
 
-    public String generateToken(String subject) {
+    private final SecretKey key = Keys.hmacShaKeyFor(SECRET.getBytes());
 
+    public String generateToken(String userId) {
         return Jwts.builder()
-                .setSubject(subject)
+                .setSubject(userId)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 86400000))
+                .setExpiration(new Date(System.currentTimeMillis() + 86400000)) // 1 day
                 .signWith(key)
                 .compact();
     }
-    
+
     public String extractUserId(String token) {
+        return getClaims(token).getSubject();
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            getClaims(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    private Claims getClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+                .getBody();
     }
 }

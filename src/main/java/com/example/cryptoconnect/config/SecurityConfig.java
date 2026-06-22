@@ -68,7 +68,10 @@ public class SecurityConfig {
                 .requestMatchers("/uploads/**").permitAll()
                 .requestMatchers("/ws/**").permitAll() 
                 .requestMatchers("/api/users/count").permitAll()
-                .requestMatchers("/ws/info/**").permitAll()  
+                .requestMatchers("/ws/info/**").permitAll() 
+                .requestMatchers("/api/communities/all").permitAll()
+                .requestMatchers("/api/communities/*/members/count").permitAll()
+                .requestMatchers("/api/communities/**").authenticated() 
 
                 
                 .requestMatchers(
