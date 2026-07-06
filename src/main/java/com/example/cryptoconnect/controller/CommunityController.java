@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.cryptoconnect.dto.CommunityUpdateRequest;
 import com.example.cryptoconnect.entity.Community;
 import com.example.cryptoconnect.entity.CommunityMember;
 import com.example.cryptoconnect.repository.CommunityMemberRepository;
@@ -118,5 +119,40 @@ public class CommunityController {
     @GetMapping("/{id}/members/count")
     public Long getMemberCount(@PathVariable Long id) {
         return (long) memberRepo.findByCommunityId(id).size();
+    }
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateCommunity(
+            @PathVariable Long id,
+            @RequestBody CommunityUpdateRequest request,
+            HttpServletRequest httpRequest) {
+
+        Long userId = Long.parseLong(
+                httpRequest.getAttribute("userId").toString());
+
+        Community community = communityRepo.findById(id)
+                .orElse(null);
+
+        if (community == null) {
+            return ResponseEntity.badRequest()
+                    .body("Community not found");
+        }
+
+        if (!community.getCreatedBy().equals(userId)) {
+            return ResponseEntity.status(403)
+                    .body("Only creator can update this community");
+        }
+
+        if (request.getName() != null &&
+                !request.getName().trim().isEmpty()) {
+            community.setName(request.getName().trim());
+        }
+
+        if (request.getDescription() != null) {
+            community.setDescription(request.getDescription().trim());
+        }
+
+        communityRepo.save(community);
+
+        return ResponseEntity.ok("Community updated successfully");
     }
 }
